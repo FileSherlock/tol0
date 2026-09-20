@@ -19,8 +19,8 @@
 //   mode 4 : u8 R,G,B per pixel, 3·w·h — what rasterize-mupdf.mjs writes for
 //            colour pages since 2026-09-03 (LAWS §9: coloured text is read as
 //            coverage and needs the channels; 2 and 3 are read, never written)
-// Decoding (including the colour-ink whitening floods) lives in blind-read.mjs
-// readGray, which is the only consumer.
+// Decoding (including the colour-ink whitening floods) lives in read-core.mjs
+// (decodeRecord / pageFromRecord), which blind-read.mjs and the bulk runner share.
 
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';

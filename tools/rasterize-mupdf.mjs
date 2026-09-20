@@ -41,7 +41,7 @@ import { fileURLToPath } from 'node:url';
 import { cacheDirFor, pageFile } from './raster-cache.mjs';
 
 // largest embedded image on the page — the producer's page raster
-function pageImageRef(page) {
+export function pageImageRef(page) {
   const xo = page.getObject()?.get('Resources')?.get('XObject');
   let best = null, bestPx = -1;
   xo?.forEach?.(val => {
@@ -64,6 +64,52 @@ function encode(mode, w, h, body) {
   return gzipSync(Buffer.concat([hdr, body]));
 }
 
+/** One page as the record it is cached as, before the gzip: {mode, w, h, body}
+ *  (mode 1 = u8 gray, mode 4 = u8 R,G,B — see the header), or null for a page
+ *  with no embedded image. cacheDoc writes it; the bulk runner (tools/bulk/)
+ *  hands it straight to the reader, so a bulk read sees the cached bytes
+ *  without the cache. */
+export function pageRecord(doc, pno) {
+  const page = doc.loadPage(pno - 1);
+  const ref = pageImageRef(page);
+  if (!ref) { page.destroy?.(); return null; }
+  // mupdf's objects live in the wasm heap and are only collected when JS's GC
+  // gets round to their wrappers — which, in a worker that decodes a million
+  // pages and allocates almost nothing on the JS side, is never soon enough
+  // (2026-09: the heap filled and every later document failed with "malloc
+  // failed"). Everything made here is destroyed here.
+  const img = doc.loadImage(ref);
+  let pix = null, rec;
+  try {
+  pix = img.toPixmap();
+  const w = pix.getWidth(), h = pix.getHeight(), n = pix.getNumberOfComponents();
+  const px = pix.getPixels();
+  if (n === 1) {
+    rec = { mode: 1, w, h, body: Buffer.from(Buffer.from(px.buffer ?? px, px.byteOffset ?? 0, w * h)) };
+  } else {
+    // Multi-component: keep the CHANNELS. The reader reads coloured text as
+    // coverage through its pen and needs R, G, B per pixel to recover it
+    // (LAWS §9); the retired mode 3 carried only sum + spread, enough to
+    // whiten colour but not to read it. Emit mode 1 when every pixel really
+    // is neutral, so an all-gray RGB page keeps the compact form.
+    const rgb = Buffer.alloc(w * h * 3);
+    let anySpread = false;
+    for (let i = 0; i < w * h; i++) {
+      const r = px[i * n], g = px[i * n + 1], b = px[i * n + 2];
+      rgb[i * 3] = r; rgb[i * 3 + 1] = g; rgb[i * 3 + 2] = b;
+      if (r !== g || g !== b) anySpread = true;
+    }
+    if (anySpread) rec = { mode: 4, w, h, body: rgb };
+    else {
+      const gray = Buffer.alloc(w * h);
+      for (let i = 0; i < w * h; i++) gray[i] = px[i * n];
+      rec = { mode: 1, w, h, body: gray };
+    }
+  }
+  } finally { pix?.destroy?.(); img.destroy?.(); page.destroy?.(); }
+  return rec;
+}
+
 /** Cache every embedded-image page of pdfPath; identical bytes to the CLI. */
 export function cacheDoc(pdfPath, { force = false, quiet = true } = {}) {
   const bytes = readFileSync(pdfPath);
@@ -77,39 +123,11 @@ export function cacheDoc(pdfPath, { force = false, quiet = true } = {}) {
   let written = 0, cached = 0, vector = 0;
   for (let pno = 1; pno <= numPages; pno++) {
     if (!force && existsSync(pagePath(pno))) { cached++; continue; }
-    const page = doc.loadPage(pno - 1);
-    const ref = pageImageRef(page);
-    if (!ref) { vector++; page.destroy?.(); continue; }
-    const pix = doc.loadImage(ref).toPixmap();
-    const w = pix.getWidth(), h = pix.getHeight(), n = pix.getNumberOfComponents();
-    const px = pix.getPixels();
-    let buf;
-    if (n === 1) {
-      buf = encode(1, w, h, Buffer.from(px.buffer ?? px, px.byteOffset ?? 0, w * h));
-    } else {
-      // Multi-component: keep the CHANNELS. The reader reads coloured text as
-      // coverage through its pen and needs R, G, B per pixel to recover it
-      // (LAWS §9); the retired mode 3 carried only sum + spread, enough to
-      // whiten colour but not to read it. Emit mode 1 when every pixel really
-      // is neutral, so an all-gray RGB page keeps the compact form.
-      const rgb = Buffer.alloc(w * h * 3);
-      let anySpread = false;
-      for (let i = 0; i < w * h; i++) {
-        const r = px[i * n], g = px[i * n + 1], b = px[i * n + 2];
-        rgb[i * 3] = r; rgb[i * 3 + 1] = g; rgb[i * 3 + 2] = b;
-        if (r !== g || g !== b) anySpread = true;
-      }
-      if (anySpread) buf = encode(4, w, h, rgb);
-      else {
-        const gray = Buffer.alloc(w * h);
-        for (let i = 0; i < w * h; i++) gray[i] = px[i * n];
-        buf = encode(1, w, h, gray);
-      }
-    }
+    const rec = pageRecord(doc, pno);
+    if (!rec) { vector++; continue; }
+    const buf = encode(rec.mode, rec.w, rec.h, rec.body);
     writeFileSync(pagePath(pno), buf);
     written++;
-    pix.destroy?.();
-    page.destroy?.();
     if (!quiet && written % 25 === 0) process.stderr.write(`\r  ${written} pages written…   `);
   }
   if (!quiet && written >= 25) process.stderr.write('\n');

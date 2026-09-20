@@ -64,10 +64,9 @@
 // BR_LINE=<baseline> (accept trace), BR_PIX=<col> (per-pixel rejection detail),
 // BR_PROF=1 (probe count and time per sweep, per page).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { gunzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
-import { materializeSet } from './glyph-bundle.mjs';
 import { POOLS } from './glyph-registry.mjs';
+import { readGray, paletteLUTs, loadSets, pageResult } from './read-core.mjs';
 import { CACHE_DIR, cacheDirFor, pageFile } from './raster-cache.mjs';
 import Engine from '../engine/ocr-engine.js';
 
@@ -102,93 +101,7 @@ for (let i = 2; i < process.argv.length; i++) {
 }
 
 // ---------------- raster access ----------------
-function readGray(path) {
-  const raw = gunzipSync(readFileSync(path));
-  const hdr = new Uint32Array(raw.buffer, raw.byteOffset, 4);
-  if (hdr[0] !== 0x31595247) throw new Error(`bad GRY1 magic: ${path}`);
-  const mode = hdr[1], w = hdr[2], h = hdr[3];
-  if (mode === 0) return null;
-  if (mode === 1) return { w, h, gray: new Uint8Array(raw.buffer, raw.byteOffset + 16, w * h) };
-  if (mode === 2) {
-    // mode 2 (legacy sum-only color page). Achromatic ink (R=G=B — plain
-    // black text) has sum ≡ 0 (mod 3) at every pixel, so gray = sum/3 is
-    // exact there; colored ink (hyperlink blue) is non-neutral at least on
-    // its AA edges. Whiten every ink component connected to a non-neutral
-    // pixel — the reader then sees only the plain text, byte-exactly.
-    // (Sum-only is BLIND to colors whose sum is a multiple of 3 — pure blue
-    // (0,0,237) reads as "neutral 79" — and floods whole letters over JPEG
-    // channel jitter; mode 3 rasters carry a spread plane instead.)
-    const sums = new Uint16Array(raw.buffer, raw.byteOffset + 16, w * h);
-    const gray = new Uint8Array(w * h);
-    const colored = new Uint8Array(w * h);
-    const stack = [];
-    for (let i = 0; i < w * h; i++) {
-      gray[i] = sums[i] >= 765 ? 255 : (sums[i] / 3) | 0;
-      if (sums[i] < 765 && sums[i] % 3) { colored[i] = 1; stack.push(i); }
-    }
-    while (stack.length) {                             // flood over connected ink
-      const i = stack.pop(), x = i % w, y = (i / w) | 0;
-      for (let dy = -1; dy <= 1; dy++)
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx, ny = y + dy;
-          if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
-          const j = ny * w + nx;
-          if (!colored[j] && sums[j] < 765) { colored[j] = 1; stack.push(j); }
-        }
-    }
-    let removed = 0;
-    for (let i = 0; i < w * h; i++) if (colored[i]) { gray[i] = 255; removed++; }
-    if (removed) console.error(`  (color page: ${removed} colored-ink px removed)`);
-    return { w, h, gray };
-  }
-  if (mode === 4) {
-    // mode 4: u8 R,G,B. ONE implementation of the colour law (LAWS §9):
-    // coloured TEXT becomes the black-ink coverage it was drawn as, through
-    // the page's own pens; what no pen explains is whitened as before.
-    const rgb = new Uint8Array(raw.buffer, raw.byteOffset + 16, w * h * 3);
-    const c = Engine.colourInk(w, h, rgb, 3);
-    if (c.convertedN || c.removed)
-      console.error(`  (colour page: ${c.convertedN} coloured px read as coverage through ${c.pens.length} pen${c.pens.length === 1 ? '' : 's'}` +
-        (c.pens.length ? ` [${c.pens.map(p => p.slice(0, 3).join(',')).join(' ')}]` : '') + `, ${c.removed} whitened)`);
-    return { w, h, gray: c.gray, converted: c.convertedN ? c.converted : null,
-      bandLo: c.bandLo, bandHi: c.bandHi };
-  }
-  if (mode !== 3) throw new Error(`mode ${mode} unsupported`);
-  // mode 3: u16 R+G+B sums + u8 per-pixel channel spread (max−min). Real
-  // color is spread ≥ 4 — seed a whitening flood that spreads ONLY through
-  // pixels whose channels differ at all (spread ≥ 1: colored AA fringes),
-  // never through neutral ink, so a redaction box touching a blue link
-  // underline survives while the underline and its fringe vanish. Spread
-  // 1–3 pixels away from color are producer JPEG jitter, NOT color: their
-  // true gray is round(sum/3) (±1 single-channel jitter rounds back
-  // exactly; heavier jitter lands within --tol 1).
-  const sums = new Uint16Array(raw.buffer, raw.byteOffset + 16, w * h);
-  const spread = new Uint8Array(raw.buffer, raw.byteOffset + 16 + 2 * w * h, w * h);
-  const gray = new Uint8Array(w * h);
-  const colored = new Uint8Array(w * h);
-  const stack = [];
-  let jitter = 0;
-  for (let i = 0; i < w * h; i++) {
-    gray[i] = sums[i] >= 765 ? 255 : Math.round(sums[i] / 3);
-    if (spread[i] >= 4) { colored[i] = 1; stack.push(i); }
-    else if (spread[i]) jitter++;
-  }
-  while (stack.length) {                               // flood through colored px only
-    const i = stack.pop(), x = i % w, y = (i / w) | 0;
-    for (let dy = -1; dy <= 1; dy++)
-      for (let dx = -1; dx <= 1; dx++) {
-        const nx = x + dx, ny = y + dy;
-        if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
-        const j = ny * w + nx;
-        if (!colored[j] && spread[j]) { colored[j] = 1; stack.push(j); }
-      }
-  }
-  let removed = 0;
-  for (let i = 0; i < w * h; i++) if (colored[i]) { gray[i] = 255; removed++; }
-  if (removed || jitter) console.error(
-    `  (color page: ${removed} colored px removed, ${jitter} jittered px neutralized)`);
-  return { w, h, gray };
-}
+// (record decoding — every mode, the colour law — lives in read-core.mjs)
 function cachePages(pdfPath) {
   const { key, dir } = cacheDirFor(pdfPath);
   if (!existsSync(join(dir, 'meta.json')))
@@ -198,139 +111,9 @@ function cachePages(pdfPath) {
   return { numPages: meta.numPages, page: pno => readGray(join(dir, pageFile(pno))) };
 }
 
-// ---------------- palette LUTs (--palette) ----------------
-// Producers that store pages as /Indexed images (the eDiscovery Nimbus family)
-// quantize the composited page ONCE at the end: page byte = gray of the
-// RGB-nearest palette entry (ties darker) for the renderer's output byte.
-// Reading the per-page palettes straight from the PDF gives the engine the
-// TRUE quant map — the histogram heuristic (--quant) misses entries and
-// mis-breaks ties.
-//
-// Resolution goes through mupdf's object API (the same dependency fontgen.mjs
-// uses for char→gid): the earlier raw-byte scrape mislocated objects on any PDF
-// whose palettes sit in object streams — it then built a garbage LUT from
-// whatever bytes it hit, which passed the white check and sent the engine
-// into a near-endless read (EFTA00039421, EFTA00009676). Per page: largest
-// /Indexed image in the page resources wins; per-entry cap hival+1 ≤ 256 by
-// spec; a palette that darkens white (lut[255] < 250) is a scan image, not a
-// page of this family — skipped.
-async function paletteLUTs(pdfPath) {
-  let mupdf;
-  try { mupdf = await import('mupdf'); }
-  catch { console.error('  (--palette: mupdf not available — run npm install)'); return new Map(); }
-  const luts = new Map();
-  let doc;
-  try { doc = mupdf.Document.openDocument(readFileSync(pdfPath), 'application/pdf'); }
-  catch { return luts; }
-  const n = doc.countPages();
-  for (let p = 0; p < n; p++) {
-    try {
-      const page = doc.loadPage(p);
-      const xo = page.getObject()?.get('Resources')?.get('XObject');
-      if (!xo || !xo.isDictionary?.()) continue;
-      let best = null, bestPx = -1;
-      xo.forEach(val => {
-        try {
-          const im = val.resolve?.() ?? val;
-          if (im.get('Subtype')?.asName?.() !== 'Image') return;
-          const px = (im.get('Width')?.asNumber?.() ?? 0) * (im.get('Height')?.asNumber?.() ?? 0);
-          const cs = im.get('ColorSpace')?.resolve?.() ?? im.get('ColorSpace');
-          if (!cs?.isArray?.() || cs.get(0)?.asName?.() !== 'Indexed') return;
-          if (px > bestPx) { bestPx = px; best = cs; }
-        } catch {}
-      });
-      if (!best) continue;
-      const hival = Math.min(best.get(2)?.asNumber?.() ?? 255, 255);
-      // readStream must be called on the indirect REF (resolve() yields an
-      // object whose isStream()/readStream() refuse — mupdf-js quirk)
-      const lookup = best.get(3);
-      let pal = null;
-      try { pal = lookup.readStream().asUint8Array(); } catch {}
-      if (!pal) { try { pal = Uint8Array.from(lookup.asByteString()); } catch {} }
-      if (!pal || pal.length < 3) continue;
-      const entries = [];
-      const nEnt = Math.min(Math.floor(pal.length / 3), hival + 1);
-      for (let k = 0; k + 2 < nEnt * 3; k += 3) entries.push([pal[k], pal[k + 1], pal[k + 2]]);
-      if (!entries.length) continue;
-      const lut = new Uint8Array(256);
-      for (let v = 0; v < 256; v++) {
-        let bst = null, bd = Infinity;
-        for (const e of entries) {
-          const d = (e[0] - v) ** 2 + (e[1] - v) ** 2 + (e[2] - v) ** 2;
-          if (d < bd || (d === bd && e[0] + e[1] + e[2] < bst[0] + bst[1] + bst[2])) { bd = d; bst = e; }
-        }
-        lut[v] = Math.round((bst[0] + bst[1] + bst[2]) / 3);
-      }
-      if (lut[255] < 250) continue;            // darkens white: scan image, not this family
-      luts.set(p + 1, lut);
-    } catch {}
-  }
-  return luts;
-}
-
-// ---------------- glyph sets ----------------
-// All sets live in ONE committed binary bundle (assets/glyphs/glyphs.bin,
-// built + byte-certified from the .npz rasters by export-glyphs.mjs);
-// glyph-bundle.mjs materializes a set by name — legacy "glyphs_x.json"
-// spellings still work. Only the bench-side extras live here.
-function loadSet(file) {
-  // --matchcols N (EXPERIMENT): the candidate trial only sees the middle N
-  // ink columns; acceptance still subtracts the FULL raster (g.ink/g.bytes)
-  // so the certification canvas is untouched. Window is centered on the
-  // median ink column (extent-centering can land in a hollow middle — '"').
-  const trim = o.matchcols > 0 ? (rec) => {
-    const cols = [...rec.inkC].sort((a, b) => a - b);
-    const med = cols[cols.length >> 1];
-    const lo = med - ((o.matchcols - 1) >> 1), hi = lo + o.matchcols - 1;
-    const keep = [];
-    for (let k = 0; k < rec.ink.length; k++)
-      if (rec.inkC[k] >= lo && rec.inkC[k] <= hi) keep.push(k);
-    if (keep.length) {
-      rec.inkC = Int16Array.from(keep, k => rec.inkC[k]);
-      rec.inkR = Int16Array.from(keep, k => rec.inkR[k]);
-      rec.inkB = Uint8Array.from(keep, k => rec.inkB[k]);
-      rec.inkA = Uint8Array.from(keep, k => rec.inkA[k]);
-    }
-  } : null;
-  const s = materializeSet(file, trim);
-  const stem = s.font.replace(/_\d+.*$/, '');           // "times_16.npz" -> "times"
-  return { ...s, fontFile: `C:/Windows/Fonts/${stem || 'times'}.ttf` };
-}
-
-// ---------------- spaces from measured gaps ----------------
-function withSpaces(L, spaceAdv) {
-  let out = '', flags = 0;
-  const boxes = L.boxes ?? [];
-  for (let i = 0; i < L.glyphs.length; i++) {
-    if (i) {
-      const a = L.glyphs[i - 1].pen + L.glyphs[i - 1].adv, b = L.glyphs[i].pen;
-      const gap = b - a;
-      if (Engine.boxBetween(boxes, L.glyphs[i - 1], L.glyphs[i])) {
-        out += ' ';                                         // gap spans a redaction box:
-      } else if (spaceAdv && gap > 0.55 * spaceAdv) {       // measured spaces meaningless
-        const n = Math.max(1, Math.round(gap / spaceAdv));
-        out += ' '.repeat(n);
-        if (Math.abs(gap - n * spaceAdv) > 0.75) flags++;   // narrow/odd space
-      }
-    }
-    const ch = L.glyphs[i].ch;
-    out += ch === 'ﬁ' ? 'fi' : ch === 'ﬂ' ? 'fl' : ch;  // ligatures transcribe as letters
-  }
-  return { text: out, oddGaps: flags };
-}
-
 // ---------------- main ----------------
 async function main() {
-  // '+' joins sets into one union POOL (mixed fonts on one line), ',' keeps
-  // separate per-band-pick sets: --glyphs a.json+b.json,c.json = [a∪b, c].
-  // Pool candidates cross-hit byte-identical fragments of a foreign font
-  // (courier body 'e' lost to a times sliver), so pool only what really
-  // mixes within a line; --union still merges everything (legacy).
-  let sets = o.glyphs.map(g => {
-    const parts = g.split('+');
-    return parts.length > 1 ? Engine.unionSets(parts.map(loadSet)) : loadSet(g);
-  });
-  if (o.union && sets.length > 1) sets = [Engine.unionSets(sets)];
+  const sets = loadSets(o.glyphs, { matchcols: o.matchcols, union: o.union });
   const t0 = Date.now();
   let pages;                                        // [{pno, page}]
   if (o.raster) pages = [{ pno: 0, page: readGray(o.raster) }];
@@ -362,34 +145,17 @@ async function main() {
     if (!page) continue;
     const { lines, objects } = await Engine.readPage(page, sets,
       { tol: o.tol, quant: (o.palette && palLuts?.get(pno)) || o.quant, shadow: o.shadow, carry });
-    const spaceAdv = Engine.spaceCalib(lines);
-    const jsonLines = [];
-    jsonPages.push({ pno, spaceAdv, objects, lines: jsonLines });
-    for (const L of lines) {
-      if (!L.set) {
-        if (L.fragOnly) { totFrags++; jsonLines.push({ top: L.top, fragOnly: true }); continue; }
-        totFails++; if (L.colour) totColour++;
-        outLines.push(''); jsonLines.push({ top: L.top, text: '', unread: true, ...(L.colour ? { colour: true } : {}) }); continue;
-      }
-      totLines++; totGlyphs += L.glyphs.length; totFails += L.fails.length; totColour += (L.colourFails ?? []).length;
-      totFrags += (L.frags ?? []).length;
-      const sp = withSpaces(L, spaceAdv);
-      outLines.push(sp.text);
-      jsonLines.push({ baseline: L.baseline, phy: L.phy, font: L.font,
-        text: sp.text, fails: L.fails.length,
-        failCols: L.fails, boxes: L.boxes, oddGaps: sp.oddGaps,
-        ...(L.frags?.length ? { boxFrags: L.frags } : {}),
-        ...(L.colourFails?.length ? { colourFails: L.colourFails } : {}),
-        ...(L.struck ? { struck: L.struck } : {}),
-        glyphs: L.glyphs.map(g => g.clip ? [g.ch, g.pen, g.clip] : [g.ch, g.pen]) });   // 3rd = px under a redaction box
-      if (truth) {
-        // row index from baseline is unknown to the reader — compare against
-        // the truth row whose letters match (letters-only first, then spaced)
-        const letters = sp.text.replace(/ /g, '');
-        const hit = truthByLetters.get(letters);
-        if (hit !== undefined) { rowExact++; if (hit.trimEnd() === sp.text.trimEnd()) spacedExact++; }
-        else { rowDiff++; if (diffs.length < 12) diffs.push({ pno, base: L.baseline, got: sp.text.slice(0, 70) }); }
-      }
+    const r = pageResult(pno, lines, objects);
+    jsonPages.push(r.json); outLines.push(...r.texts);
+    totLines += r.tot.lines; totGlyphs += r.tot.glyphs; totFails += r.tot.fails; totFrags += r.tot.frags; totColour += r.tot.colour;
+    if (truth) for (const jl of r.json.lines) {
+      if (jl.baseline === undefined) continue;
+      // row index from baseline is unknown to the reader — compare against
+      // the truth row whose letters match (letters-only first, then spaced)
+      const letters = jl.text.replace(/ /g, '');
+      const hit = truthByLetters.get(letters);
+      if (hit !== undefined) { rowExact++; if (hit.trimEnd() === jl.text.trimEnd()) spacedExact++; }
+      else { rowDiff++; if (diffs.length < 12) diffs.push({ pno, base: jl.baseline, got: jl.text.slice(0, 70) }); }
     }
     process.stderr.write(`\r  page ${pno}: ${lines.length} bands`);
   }
