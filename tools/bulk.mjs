@@ -17,6 +17,12 @@
 //            --ladder tol0 | all   the app's escalating read instead of one
 //            flat pass: palette and mixed-font rungs, byte-exact only (tol0) or
 //            on to the tolerant rungs (all) — tools/bulk/job-read.mjs.
+//            --inventory <inventory run dir>   read only what is rendered text:
+//            pages the inventory classes as scan, small, blank or vector are
+//            skipped (and recorded as skipped), a document with no rendered
+//            page is not opened at all.
+//            --page-budget S   seconds a page may take under --ladder (default
+//            120; 0 = none): it keeps the best rung that finished.
 //
 // Which documents:  --in <dir> [--recursive] | --list <file of paths>, then
 //   --sample N [--seed S]   N of them, drawn reproducibly (a benchmark is the
@@ -53,7 +59,8 @@ import { availableParallelism, hostname, totalmem } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runPool } from './bulk/pool.mjs';
-import { openSink } from './bulk/sink.mjs';
+import { openSink, streamRecords } from './bulk/sink.mjs';
+import { classOf } from './bulk/classify.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..');
@@ -87,6 +94,8 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--shadow') o.shadow = true;
   else if (a === '--quant') o.quant = true;
   else if (a === '--palette') o.palette = true;
+  else if (a === '--inventory') o.inventory = resolve(next());
+  else if (a === '--page-budget') o.pageBudget = +next();
   else if (a === '--ladder') { o.ladder = next(); if (!['tol0', 'all'].includes(o.ladder)) die('--ladder tol0 | all'); }
   else die(`unknown arg ${a}`);
 }
@@ -150,11 +159,24 @@ if (cmd === 'read') {
     config.tol = o.tol; config.palette = o.palette; config.quant = o.quant;
   }
   config.shadow = o.shadow; config.ladder = o.ladder;
+  config.pageBudgetS = o.ladder ? (o.pageBudget ?? 120) : 0;
 }
 
 const sink = openSink(o.out);
 const items = paths.filter(p => !sink.done.has(nameOf(p))).map(p => { const bytes = statSync(p).size; return { name: nameOf(p), path: p, bytes, big: bytes > o.bigMB * 1048576 }; });
 const skipped = paths.length - items.length;
+// the inventory's word on each page: what is not rendered text is not read
+let notText = 0;
+if (cmd === 'read' && o.inventory) {
+  const want = new Map(items.map(it => [it.name, it]));
+  for await (const r of streamRecords(o.inventory)) {
+    const it = want.get(r.name); if (!it) continue;
+    it.skip = {};
+    for (const pg of r.p) { const c = classOf(pg); if (c !== 'rendered') { it.skip[pg.n] = c; notText++; } }
+    it.allSkipped = r.p.length > 0 && Object.keys(it.skip).length === r.p.length;
+  }
+  console.error(`inventory: ${notText} pages of the selected documents are not rendered text and will be skipped`);
+}
 const timeoutMs = o.timeout ? o.timeout * 1000
   : cmd === 'read' ? it => Math.min(4 * 3600e3, 120e3 + 45e3 * Math.ceil(it.bytes / 15000)) : 120e3;
 

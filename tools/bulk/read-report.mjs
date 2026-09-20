@@ -11,6 +11,10 @@
 //   partial   some lines clean, some not
 //   unread    ink on it and no set read any of it
 //   empty     no bands at all          vector  no embedded image
+//   skipped   the inventory said it is not rendered text (scan, small, blank…)
+//             and the read did not try (bulk.mjs read --inventory)
+// A document is RIGHT when it has a clean page and every other page is clean,
+// empty or a skipped blank — a document with a scanned page in it is not.
 // The to-do list: which sets did the reading, where the time went (the
 // slowest documents are engine work, not set work), and — with the inventory
 // of the same corpus — which WRITERS and LINE HEIGHTS hold the lines nobody
@@ -42,6 +46,7 @@ const pct = (a, b) => (b ? (100 * a / b).toFixed(1) + ' %' : '–');
 
 export function pageStatus(P) {
   if (P.vector) return 'vector';
+  if (P.skipped) return 'skipped';
   let read = 0, clean = 0, unread = 0;
   for (const L of P.lines ?? []) { if (L.unread) unread++; else if (L.baseline !== undefined) { read++; if (!L.fails) clean++; } }
   const exact = !P.pass || +P.pass.split('|')[0] === 0;
@@ -51,21 +56,22 @@ export function pageStatus(P) {
 // ---- the read run ----
 const byName = new Map();                                  // last record of a name wins (sink.mjs)
 for await (const r of records(dir)) byName.set(r.name, r);
-const T = { docs: 0, right: 0, pages: 0, status: new Map(), rungs: new Map(), lines: 0, clean: 0, unread: 0, glyphs: 0, fails: 0, fonts: new Map() };
+const T = { docs: 0, right: 0, pages: 0, status: new Map(), rungs: new Map(), skipped: new Map(), budget: 0, rightRendered: 0, lines: 0, clean: 0, unread: 0, glyphs: 0, fails: 0, fonts: new Map() };
 const perPage = new Map();                                 // name → [status per page, lines, clean, unread]
 for (const r of byName.values()) {
   T.docs++; T.lines += r.tot.lines; T.clean += r.tot.clean; T.unread += r.tot.unread; T.glyphs += r.tot.glyphs; T.fails += r.tot.fails;
   const st = [];
   for (const P of r.p) {
-    const s = pageStatus(P); st.push({ n: P.pno, s, lines: 0, clean: 0, unread: 0 });
-    T.pages++; bump(T.status, s); if (P.pass) bump(T.rungs, P.pass);
+    const s = pageStatus(P); st.push({ n: P.pno, s, why: P.skipped, lines: 0, clean: 0, unread: 0 });
+    T.pages++; bump(T.status, s); if (P.skipped) bump(T.skipped, P.skipped); if (P.budget) T.budget++; if (P.pass) bump(T.rungs, P.pass);
     for (const L of P.lines ?? []) {
       const e = st.at(-1);
       if (L.unread) e.unread++; else if (L.baseline !== undefined) { e.lines++; if (!L.fails) e.clean++; bump(T.fonts, L.font); }
     }
   }
   perPage.set(r.name, st);
-  if (st.some(x => x.s === 'clean') && st.every(x => x.s === 'clean' || x.s === 'empty')) T.right++;
+  if (st.some(x => x.s === 'clean') && st.every(x => x.s === 'clean' || x.s === 'empty' || (x.s === 'skipped' && x.why === 'blank'))) T.right++;
+  if (st.some(x => x.s === 'clean') && st.every(x => x.s === 'clean' || x.s === 'empty' || x.s === 'skipped')) T.rightRendered++;
 }
 
 // ---- time, from the index ----
@@ -86,7 +92,10 @@ out.push(`documents ${T.docs} (${[...statusN].map(([k, v]) => `${k} ${v}`).join(
 out.push('');
 out.push(`RIGHT AT TOLERANCE 0   documents ${T.right} of ${T.docs} (${pct(T.right, T.docs)}) · pages ${T.status.get('clean') ?? 0} of ${T.pages} (${pct(T.status.get('clean') ?? 0, T.pages)})` +
   ` · lines ${T.clean} of ${T.lines + T.unread} (${pct(T.clean, T.lines + T.unread)})`);
-out.push('pages                  ' + ['clean', 'tolerant', 'partial', 'unread', 'empty', 'vector'].map(k => `${k} ${T.status.get(k) ?? 0}`).join(' · '));
+out.push('pages                  ' + ['clean', 'tolerant', 'partial', 'unread', 'empty', 'vector', 'skipped'].map(k => `${k} ${T.status.get(k) ?? 0}`).join(' · '));
+if (T.skipped.size || T.budget) out.push(`                       skipped: ${[...T.skipped].map(([k, v]) => `${k} ${v}`).join(' · ') || '–'} · pages that ran out their time budget: ${T.budget}`);
+const readable = T.pages - (T.status.get('skipped') ?? 0) - (T.status.get('vector') ?? 0);
+out.push(`of what is rendered text: documents right on every rendered page ${T.rightRendered} of ${T.docs} (${pct(T.rightRendered, T.docs)}) · pages ${T.status.get('clean') ?? 0} of ${readable} (${pct(T.status.get('clean') ?? 0, readable)})`);
 out.push(`lines read ${T.lines} (clean ${T.clean}) · bands no set read ${T.unread} · glyphs ${T.glyphs} · unexplained clusters ${T.fails}`);
 if (T.rungs.size) out.push('rung that read the page (tol|palette|mixed-font): ' + top(T.rungs).map(([k, v]) => `${k} ${v}`).join(' · '));
 out.push('');

@@ -15,7 +15,8 @@
 import { closeSync, createReadStream, createWriteStream, existsSync, mkdirSync, openSync, readFileSync,
   readdirSync, statSync, unlinkSync, writeFileSync, writeSync } from 'node:fs';
 import { join } from 'node:path';
-import { createGzip, gunzipSync } from 'node:zlib';
+import { createGzip, createGunzip, gunzipSync } from 'node:zlib';
+import { createInterface } from 'node:readline';
 import { pipeline } from 'node:stream/promises';
 
 const partName = i => `part-${String(i).padStart(4, '0')}.jsonl`;
@@ -61,6 +62,16 @@ export function openSink(outDir, { partBytes = 256 << 20 } = {}) {
     },
     async close() { closeSync(fd); closeSync(doneFd); await Promise.all(zipping); },
   };
+}
+
+/** A run directory's records, one at a time, in file order (a corpus-sized run
+ *  does not fit in memory; a torn last line of a run still going is skipped). */
+export async function* streamRecords(outDir) {
+  for (const f of readdirSync(outDir).filter(f => /^part-\d{4}\.jsonl(\.gz)?$/.test(f)).sort()) {
+    const src = createReadStream(join(outDir, f));
+    const rl = createInterface({ input: f.endsWith('.gz') ? src.pipe(createGunzip()) : src, crlfDelay: Infinity });
+    for await (const line of rl) { try { yield JSON.parse(line); } catch {} }
+  }
 }
 
 /** Every record of a run directory, the last one of a name winning. For tools
