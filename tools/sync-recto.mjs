@@ -143,4 +143,4 @@ if (o.check) {
   console.log(stale ? `\n${stale} file(s) stale — run: npm run sync:recto` : '\nRecto is in sync');
   process.exit(stale ? 1 : 0);
 }
-console.log(synced ? `\nsynced ${synced} file(s) -> ${PLUGIN}` : '\nnothing to do — Recto already in sync');
+console.log(synced ? `\nsynced ${synced} file(s) -> ${layout.plugin}` : '\nnothing to do — Recto already in sync');
