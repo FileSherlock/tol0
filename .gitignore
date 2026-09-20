@@ -8,6 +8,7 @@ fixtures/corpus/
 **/raster-cache/
 *.gray.gz
 gate-out/
+bulk-out/
 
 # --- derived glyph sets ----------------------------------------------------
 # .npz files are rasterized bitmaps OF A FACE, so they inherit that face's

@@ -92,6 +92,29 @@ Reading is not rendering: the rasterizer decodes the producer's own embedded
 page image, because rendering would invent pixels and leave nothing to certify
 against ([law §7](docs/LAWS.md#7-the-page-is-decoded-never-rendered)).
 
+## A corpus, not a document
+
+`blind-read.mjs` is one document in one process. A corpus of half a million
+is `tools/bulk.mjs`: persistent workers on every core (the glyph sets are
+loaded once per worker, not once per document), results written by one
+process into a run directory you can kill and restart at will, and a page
+read straight from the PDF's embedded image — no raster cache in between.
+
+```bash
+node tools/bulk.mjs inventory --in <dir of PDFs> --out bulk-out/inventory     # what every page IS: ms a page
+node tools/bulk/inventory-report.mjs bulk-out/inventory                      # …read as the questions that steer a year
+node tools/bulk.mjs read --in <dir> --out bulk-out/read-app --roster app      # the certified read, kept slim and lossless
+node tools/bulk.mjs status --out bulk-out/read-app
+```
+
+A bulk read **is** `blind-read`'s read — both stand on `tools/read-core.mjs`,
+and `test/bulk.test.js` holds a gate document to byte-identical JSON. It is
+also built for a machine someone is sitting at: the run lives in a systemd
+scope the kernel caps at half the RAM, workers are niced, replaced when they
+grow, and huge files take a lane of their own — the reasons are in
+`tools/bulk/pool.mjs`, and one of them is a desktop session that did not
+survive the first attempt.
+
 ## The gate
 
 The gate is what makes this repo trustworthy. It re-reads a fixed set of
@@ -162,6 +185,7 @@ engine/     the DOM-free matcher: ink bands, baseline pin, the composite-aware
             ftraster.js is the certified rasterizer + font parsers (bytes in, so a
             browser runs what is certified) and makes glyph sets on demand
 tools/      fontgen · glyph registry/bundle · rasterizer · reader CLI · gate · sync ·
+            bulk (tools/bulk/: the corpus runner — pool, sink, inventory and read jobs) ·
             the clip and hypothesis benches · the Recto verifiers
             · ladder-bench (Recto's escalating read, timed per rung — the speed bench)
 lab/        the other half: what produced these pixels? (see lab/README.md)

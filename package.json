@@ -5,7 +5,7 @@
   "description": "Read government documents at tolerance 0 \u2014 every line certified, never sampled.",
   "license": "MIT",
   "scripts": {
-    "test": "node test/test.js && node test/engine.test.js && node test/render.test.js && node test/hypothesis.test.js && node test/ftraster.test.js",
+    "test": "node test/test.js && node test/engine.test.js && node test/render.test.js && node test/hypothesis.test.js && node test/ftraster.test.js && node test/bulk.test.js",
     "test:engine": "node test/engine.test.js",
     "certify:ftclone": "node ftclone/certify.mjs",
     "certify:render": "node ftclone/certify-render.mjs",
@@ -13,6 +13,7 @@
     "bench:hypothesis": "node tools/hypothesis-bench.mjs",
     "gate": "node tools/gate.mjs",
     "read": "node tools/blind-read.mjs",
+    "bulk": "node tools/bulk.mjs",
     "ladder": "node tools/ladder-bench.mjs",
     "rasterize": "node tools/rasterize-mupdf.mjs",
     "glyphs": "node tools/export-glyphs.mjs",
