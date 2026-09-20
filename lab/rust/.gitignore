@@ -1,0 +1,10 @@
+target/
+# 6 MB of coverage buffers, regenerated from the shipped faces in seconds by
+# `npm run rust:certify`. The golden-*.json control sweeps beside it ARE
+# committed — those are the oracle's recorded output, which is the only thing
+# here that cannot be re-derived without running the JS.
+fixtures/golden.bin
+fixtures/rust-*.json
+# mupdf's cp→gid tables for the shipped CFFs — derived, and rewritten by
+# certify.mjs on every run.
+gidmaps.json

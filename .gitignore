@@ -1,0 +1,71 @@
+node_modules/
+
+# --- the corpus: real documents. Never committed, in any form. -------------
+fixtures/corpus/
+*.pdf
+
+# --- derived caches --------------------------------------------------------
+**/raster-cache/
+*.gray.gz
+gate-out/
+
+# --- derived glyph sets ----------------------------------------------------
+# .npz files are rasterized bitmaps OF A FACE, so they inherit that face's
+# licence — they are not merely "generated data". Regenerate locally:
+#   node tools/glyph-sets.mjs --plan
+*.npz
+# ...except the 13 sets whose face is redistributable and ships in fonts/.
+# The authority for what may be committed is PROVENANCE src:'free' in
+# tools/glyph-registry.mjs; npm test asserts every 'free' set is present, so a
+# set that belongs here and is missing fails the suite.
+#
+# Listed one by one, NOT as `nimbus*.npz`: a name-shaped glob decides licence by
+# spelling. Measured 2026-07-26 — populating assets/fonts/ from the old repo's
+# local sets un-ignored four `nimbussans*` npz that PROVENANCE has never
+# classified at all (they are not in SETS). Provenance is the authority, so the
+# exception enumerates exactly what provenance permits.
+!assets/fonts/nimbus_791.npz
+!assets/fonts/nimbusrom_1024.npz
+!assets/fonts/nimbusrombd_1024.npz
+!assets/fonts/nimbusromi_1024.npz
+!assets/fonts/nimbusromg35_1024.npz
+!assets/fonts/nimbusromlin_1024.npz
+!assets/fonts/nimbusromlin_983.npz
+!assets/fonts/nimbusrombdlin_1024.npz
+!assets/fonts/nimbusrombdlin_1194.npz
+!assets/fonts/nimbusromilin_1024.npz
+!assets/fonts/nimbussansbdlin_1536.npz
+!assets/fonts/nimbussansg118_1024.npz
+!assets/fonts/dejavuserif_786.npz
+
+# glyphs.bin bundles whatever sets you have locally, so it is per-machine and
+# derived — build it with: node tools/export-glyphs.mjs
+assets/glyphs/
+
+# --- font binaries ---------------------------------------------------------
+# Reference system fonts by path; never ship them. The previous repo committed
+# 431 MB of Microsoft CJK TTFs before adding this rule, and gitignoring a path
+# does not untrack it — hence the blanket ignore plus one narrow exception.
+*.ttf
+*.ttc
+*.otf
+*.cff
+*.pfb
+!fonts/**
+
+# --- the lab ---------------------------------------------------------------
+# Everything the lab writes is either corpus pixels or derived from them.
+# lab/pages/ and lab/targets/ are literally slices of documents that are not
+# distributed, so they carry the corpus rule, not the "generated data" rule.
+lab/pages/
+lab/targets/
+lab/*.json
+!lab/package.json
+# The m bank is 9 MB of rasters of every font ON THIS MACHINE — per-machine by
+# construction, and derivative of those faces. Rebuild it: node lab/mbank.mjs build
+lab/m-bank.json
+# Extracted TTC subfonts. Already covered by the *.ttf rule above; named here
+# because this is the exact shape of the mistake that put 431 MB of Microsoft
+# CJK binaries into the old repo's history.
+lab/.fontcache/
+*.png

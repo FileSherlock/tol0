@@ -1,0 +1,23 @@
+# This repo's entire premise is byte-comparison. Git must never rewrite a byte
+# it wasn't asked to. Source normalizes to LF; everything compared byte-for-byte
+# is declared binary so no eol/ident/filter conversion can ever touch it.
+* text=auto eol=lf
+
+*.ttf  binary
+*.otf  binary
+*.ttc  binary
+*.cff  binary
+*.pfb  binary
+*.npz  binary
+*.bin  binary
+*.gz   binary
+*.pdf  binary
+*.pgm  binary
+
+# Gate references and fixtures ARE the expected output — a changed byte is the
+# signal, so nothing may normalize them.
+fixtures/**   -text
+tools/gate-ref/** -text
+# and the same for the Rust engine's goldens: they are lab/sweep.mjs's recorded
+# output, compared string-for-string against a fresh run.
+lab/rust/fixtures/** -text

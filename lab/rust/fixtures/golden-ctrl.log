@@ -1,0 +1,16 @@
+72 distinct templates over 18 chars from lab/targets/_rustctrl
+dims probe: a e m n o r s t   stage-B screen: a e m n o r
+roster: 3 faces
+Carlito-Regular.ttf: 13 dims survivors [826,827,828,829,830,831,832,833,834,835,836,837,838]
+  *** Carlito-Regular.ttf em64=832: fz — 72 templates / 18 chars / weight 324  [1s]
+  Carlito-Regular.ttf: 13 configs in 9s
+DejaVuSerif.ttf: 13 dims survivors [826,827,828,829,830,831,832,833,834,835,836,837,838]
+  DejaVuSerif.ttf: 13 configs in 8s
+NimbusSans-Regular.cff: 13 dims survivors [826,827,828,829,830,831,832,833,834,835,836,837,838]
+  NimbusSans-Regular.cff: 13 configs in 10s
+
+top configs by observation weight (of 324 target observations):
+  Carlito-Regular.ttf    em64  832 fz          72 templates / 18 chars / weight 324 (100.0%)
+
+confirm the winner before believing it:  node lab/identify.mjs --targets <hunt> --scan Carlito-Regular.ttf --ems 832..832 --law fz
+wrote lab/rust/fixtures/golden-ctrl.json

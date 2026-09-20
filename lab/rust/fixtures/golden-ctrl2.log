@@ -1,0 +1,16 @@
+72 distinct templates over 18 chars from lab/targets/_rustctrl2
+dims probe: a e m n o r s t   stage-B screen: a e m n o r
+roster: 3 faces
+NimbusMonoPS-Regular.cff: 13 dims survivors [785,786,787,788,789,790,791,792,793,794,795,796,797]
+  *** NimbusMonoPS-Regular.cff em64=791: fzLin — 72 templates / 18 chars / weight 324  [2s]
+  NimbusMonoPS-Regular.cff: 13 configs in 12s
+Carlito-Regular.ttf: 13 dims survivors [785,786,787,788,789,790,791,792,793,794,795,796,797]
+  Carlito-Regular.ttf: 13 configs in 9s
+NimbusRoman-Regular.cff: 13 dims survivors [785,786,787,788,789,790,791,792,793,794,795,796,797]
+  NimbusRoman-Regular.cff: 13 configs in 11s
+
+top configs by observation weight (of 324 target observations):
+  NimbusMonoPS-Regular.cff em64  791 fzLin       72 templates / 18 chars / weight 324 (100.0%)
+
+confirm the winner before believing it:  node lab/identify.mjs --targets <hunt> --scan NimbusMonoPS-Regular.cff --ems 791..791 --law fzLin
+wrote lab/rust/fixtures/golden-ctrl2.json

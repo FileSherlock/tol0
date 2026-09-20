@@ -1,0 +1,747 @@
+{
+ "targetsHash": "59be1600b667bcd1",
+ "nTargets": 72,
+ "oracleSecs": 27.7,
+ "targets": "lab/targets/_rustctrl",
+ "ems": [
+  826,
+  838
+ ],
+ "fonts": [
+  "fonts/Carlito-Regular.ttf",
+  "%LOCALAPPDATA%/Microsoft/Windows/Fonts/DejaVuSerif.ttf",
+  "fonts/NimbusSans-Regular.cff"
+ ],
+ "hits": [
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "a",
+   "id": "97_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "a",
+   "id": "97_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "a",
+   "id": "97_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "a",
+   "id": "97_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "e",
+   "id": "101_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "e",
+   "id": "101_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "e",
+   "id": "101_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "e",
+   "id": "101_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "m",
+   "id": "109_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "m",
+   "id": "109_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "m",
+   "id": "109_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "m",
+   "id": "109_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "n",
+   "id": "110_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "n",
+   "id": "110_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "n",
+   "id": "110_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "n",
+   "id": "110_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "o",
+   "id": "111_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "o",
+   "id": "111_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "o",
+   "id": "111_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "o",
+   "id": "111_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "r",
+   "id": "114_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "r",
+   "id": "114_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "r",
+   "id": "114_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "r",
+   "id": "114_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "s",
+   "id": "115_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "s",
+   "id": "115_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "s",
+   "id": "115_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "s",
+   "id": "115_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "t",
+   "id": "116_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "t",
+   "id": "116_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "t",
+   "id": "116_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "t",
+   "id": "116_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "u",
+   "id": "117_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "u",
+   "id": "117_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "u",
+   "id": "117_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "u",
+   "id": "117_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "A",
+   "id": "65_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "A",
+   "id": "65_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "A",
+   "id": "65_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "A",
+   "id": "65_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "B",
+   "id": "66_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "B",
+   "id": "66_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "B",
+   "id": "66_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "B",
+   "id": "66_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "E",
+   "id": "69_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "E",
+   "id": "69_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "E",
+   "id": "69_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "E",
+   "id": "69_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "H",
+   "id": "72_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "H",
+   "id": "72_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "H",
+   "id": "72_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "H",
+   "id": "72_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "M",
+   "id": "77_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "M",
+   "id": "77_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "M",
+   "id": "77_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "M",
+   "id": "77_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "N",
+   "id": "78_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "N",
+   "id": "78_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "N",
+   "id": "78_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "N",
+   "id": "78_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "O",
+   "id": "79_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "O",
+   "id": "79_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "O",
+   "id": "79_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "O",
+   "id": "79_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "R",
+   "id": "82_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "R",
+   "id": "82_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "R",
+   "id": "82_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "R",
+   "id": "82_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "S",
+   "id": "83_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "S",
+   "id": "83_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "S",
+   "id": "83_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "ch": "S",
+   "id": "83_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  }
+ ],
+ "summary": [
+  {
+   "font": "Carlito-Regular.ttf",
+   "em64": 832,
+   "law": "fz",
+   "tmpl": 72,
+   "weight": 324,
+   "chars": "aemnorstuABEHMNORS"
+  }
+ ]
+}

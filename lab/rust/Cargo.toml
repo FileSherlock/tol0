@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["ftclone", "hunt"]
+
+[workspace.package]
+edition = "2021"
+
+[workspace.dependencies]
+rayon = "1.10"
+rustc-hash = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+# This port exists to be byte-certified against the JS oracle, so the optimizer
+# must never get freedom to reassociate float math. rustc never does that
+# without explicit fast-math intrinsics, which nothing here uses.
+[profile.release]
+lto = "fat"
+codegen-units = 1

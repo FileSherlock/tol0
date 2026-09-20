@@ -1,0 +1,747 @@
+{
+ "targetsHash": "ba32f850464e644b",
+ "nTargets": 72,
+ "oracleSecs": 31.7,
+ "targets": "lab/targets/_rustctrl2",
+ "ems": [
+  785,
+  797
+ ],
+ "fonts": [
+  "fonts/NimbusMonoPS-Regular.cff",
+  "fonts/Carlito-Regular.ttf",
+  "fonts/NimbusRoman-Regular.cff"
+ ],
+ "hits": [
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "a",
+   "id": "97_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "a",
+   "id": "97_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "a",
+   "id": "97_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "a",
+   "id": "97_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "e",
+   "id": "101_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "e",
+   "id": "101_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "e",
+   "id": "101_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "e",
+   "id": "101_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "m",
+   "id": "109_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "m",
+   "id": "109_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "m",
+   "id": "109_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "m",
+   "id": "109_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "n",
+   "id": "110_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "n",
+   "id": "110_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "n",
+   "id": "110_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "n",
+   "id": "110_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "o",
+   "id": "111_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "o",
+   "id": "111_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "o",
+   "id": "111_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "o",
+   "id": "111_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "r",
+   "id": "114_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "r",
+   "id": "114_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "r",
+   "id": "114_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "r",
+   "id": "114_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "s",
+   "id": "115_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "s",
+   "id": "115_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "s",
+   "id": "115_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "s",
+   "id": "115_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "t",
+   "id": "116_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "t",
+   "id": "116_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "t",
+   "id": "116_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "t",
+   "id": "116_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "u",
+   "id": "117_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "u",
+   "id": "117_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "u",
+   "id": "117_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "u",
+   "id": "117_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "A",
+   "id": "65_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "A",
+   "id": "65_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "A",
+   "id": "65_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "A",
+   "id": "65_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "B",
+   "id": "66_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "B",
+   "id": "66_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "B",
+   "id": "66_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "B",
+   "id": "66_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "E",
+   "id": "69_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "E",
+   "id": "69_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "E",
+   "id": "69_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "E",
+   "id": "69_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "H",
+   "id": "72_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "H",
+   "id": "72_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "H",
+   "id": "72_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "H",
+   "id": "72_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "M",
+   "id": "77_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "M",
+   "id": "77_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "M",
+   "id": "77_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "M",
+   "id": "77_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "N",
+   "id": "78_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "N",
+   "id": "78_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "N",
+   "id": "78_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "N",
+   "id": "78_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "O",
+   "id": "79_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "O",
+   "id": "79_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "O",
+   "id": "79_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "O",
+   "id": "79_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "R",
+   "id": "82_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "R",
+   "id": "82_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "R",
+   "id": "82_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "R",
+   "id": "82_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "S",
+   "id": "83_p0_v1",
+   "obs": 3,
+   "fx": 0,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "S",
+   "id": "83_p1_v1",
+   "obs": 4,
+   "fx": 16,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "S",
+   "id": "83_p2_v1",
+   "obs": 5,
+   "fx": 32,
+   "fy": 0
+  },
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "ch": "S",
+   "id": "83_p3_v1",
+   "obs": 6,
+   "fx": 48,
+   "fy": 0
+  }
+ ],
+ "summary": [
+  {
+   "font": "NimbusMonoPS-Regular.cff",
+   "em64": 791,
+   "law": "fzLin",
+   "tmpl": 72,
+   "weight": 324,
+   "chars": "aemnorstuABEHMNORS"
+  }
+ ]
+}

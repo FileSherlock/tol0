@@ -1,0 +1,36 @@
+{
+  "name": "tol0",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Read government documents at tolerance 0 \u2014 every line certified, never sampled.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/test.js && node test/engine.test.js && node test/render.test.js && node test/hypothesis.test.js && node test/ftraster.test.js",
+    "test:engine": "node test/engine.test.js",
+    "certify:ftclone": "node ftclone/certify.mjs",
+    "certify:render": "node ftclone/certify-render.mjs",
+    "certify:rect": "node ftclone/certify-rect.mjs",
+    "bench:hypothesis": "node tools/hypothesis-bench.mjs",
+    "gate": "node tools/gate.mjs",
+    "read": "node tools/blind-read.mjs",
+    "ladder": "node tools/ladder-bench.mjs",
+    "rasterize": "node tools/rasterize-mupdf.mjs",
+    "glyphs": "node tools/export-glyphs.mjs",
+    "glyphs-check": "node tools/export-glyphs.mjs --check",
+    "glyph-sets": "node tools/glyph-sets.mjs",
+    "glyph-sets:verify": "node tools/glyph-sets.mjs --verify",
+    "set-fonts": "node tools/export-set-fonts.mjs",
+    "sync:recto": "node tools/sync-recto.mjs",
+    "sync:recto:check": "node tools/sync-recto.mjs --check",
+    "recto-test": "node tools/test-recto-app.mjs",
+    "lab:selftest": "node lab/selftest.mjs",
+    "rust:build": "cargo build --release --manifest-path lab/rust/Cargo.toml",
+    "rust:certify": "node lab/rust/certify.mjs"
+  },
+  "dependencies": {
+    "mupdf": "^1.28.0"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}
