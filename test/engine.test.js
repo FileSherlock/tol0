@@ -336,6 +336,25 @@ test("scanLine: the pieces an underline leaves at a descender are the rule's own
   assert.strictEqual(L.residual, 0);
 });
 
+test("scanLine: a rule's pieces on a page that cannot hold their byte are retired, not spun on", () => {
+  // The same broken underline, on a palettized page whose palette has no 0:
+  // the absorbed byte is never accepted, so only an explicit retire takes the
+  // piece's columns off the books. The rule branch forgot the ones past
+  // col+2, and the scan came back to them for good (EFTA00039989 p4: any set,
+  // one probe, no end — a worker's whole heap in flood-cache steps). A scan
+  // that returns at all is the test; node:test has no clock for one that does not.
+  const set = makeSet('synth', [...abcSet().byPhy.get(0), makeGlyph('p', ['#..', '#..', '##.', '#..', '#..', '#..'], { dy: -3, adv: 4 })]);
+  const page = makePage(140, 30);
+  for (let x = 10; x < 27; x++) page.gray[22 * 140 + x] = 0;
+  for (let x = 32; x < 120; x++) page.gray[22 * 140 + x] = 0;
+  const det = E.detectObjects(page);
+  const rules = det.objects.filter(o => o.type === 'rule');
+  const Q = new Uint8Array(256).map((_, v) => (v < 8 ? 8 : v));          // no entry below 8: a 0 on the page is nobody's fixpoint
+  const L = E.scanLine(page, det.mask, set, 0, 20, 0, 140, Infinity, Infinity, 0, Q, null, null, null, null, { rules });
+  assert.strictEqual(L.glyphs.length, 0);
+  assert.strictEqual(L.fails.length, 0, "the piece is the rule's own: absorbed, no □");
+});
+
 // ---- colourInk (LAWS §9) ----
 // A coloured pen composites over white per channel, page_c = (65280 −
 // (255 − C_c)·e) >> 8 — so a blue word is the black word seen through the

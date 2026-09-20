@@ -919,6 +919,9 @@
   // the fail flood's stack (scanLine): one typed buffer per module, grown on
   // demand — a pixel can be pushed once per neighbour before it is visited
   const FLOOD_CACHE_PX = 32e6;               // per band: see the flood cache in scanLine
+  const FLOOD_STEP_COST = 48;                // …and what a remembered step costs beyond its pixels, in the same unit:
+                                             // a band of tiny floods is millions of steps (an object, a typed-array
+                                             // header, a key) and filled the heap with hardly a pixel in it
   let flStack = new Int32Array(1 << 12);
   const growStack = (st) => { const n = new Int32Array(st.length * 2); n.set(st); return n; };
   // probe window scratch (scanLine): canvas / skip / edge planes, the flood's
@@ -1511,7 +1514,7 @@
           if (okDust) {
             if (fcLive) {                         // a dust step, for the flood cache's step count
               const st = fcSteps[fcK];
-              if (st === undefined) { fcSteps[fcK] = { kind: 2, col }; fcK++; }
+              if (st === undefined) { if ((fc.px = (fc.px | 0) + FLOOD_STEP_COST) <= FLOOD_CACHE_PX) { fcSteps[fcK] = { kind: 2, col }; fcK++; } else fcLive = false; }
               else if (st.kind === 2 && st.col === col) fcK++;
               else fcLive = false;
             }
@@ -1608,7 +1611,7 @@
           // before there was a cache. Measured on a 3-page document no set reads:
           // 1.32 GB / 57 s before, 0.47 GB / 66 s now.
           if (fcLive) {
-            if ((fc.px = (fc.px | 0) + comp.length) <= FLOOD_CACHE_PX) { fcSteps[fcK] = { kind: 1, col, comp: Int32Array.from(comp), right: compRight }; fcK++; }
+            if ((fc.px = (fc.px | 0) + comp.length + FLOOD_STEP_COST) <= FLOOD_CACHE_PX) { fcSteps[fcK] = { kind: 1, col, comp: Int32Array.from(comp), right: compRight }; fcK++; }
             else fcLive = false;
           }
         }
@@ -1637,6 +1640,16 @@
               const px = k >> 16, py = k & 0xffff;
               setCan(px, py, pageAt(px, py));
               skip[(py - y0) * bw + (px - xFrom)] = 2;
+              // ABSORBED = RETIRED here too. The loop above retired the pixels
+              // up to col+2; the rest of the rule is absorbed HERE, and on a
+              // page that cannot accept the byte (an /Indexed palette, a colour
+              // band) it stayed counted: the next column of the rule came back
+              // as the anchor, flooded to nothing — everything was skip by
+              // then — recorded nothing, and the scan span on it for good,
+              // a flood-cache step a turn (EFTA00039989 p4: any set, one probe,
+              // 4 GB of heap and no end; an ordinary e-mail with a rule in it).
+              if (px > col + 2 && py >= cTop && py < cBot && !okAt(py * W + px, pageAt(px, py), 0))
+                unexpl[px - xFrom]--;
             }
             cursor = col;
             continue;
@@ -1652,6 +1665,11 @@
         // ascender tip row-glued to this band's bottom).
         if (col > failGuard) records.push({ col, comp });
         failGuard = Math.max(failGuard, compRight);
+        // LAST RESORT against the livelock above and its kin (this is the third
+        // of its kind): a fail that absorbed nothing leaves the column exactly
+        // as it found it, and the loop would come straight back. Such a column
+        // is retired by force — its ink stays unread, the scan goes on.
+        if (!comp.length && unexpl[col - xFrom] > 0) unexpl[col - xFrom] = 0;
         cursor = col;
         if (fails.length + records.length >= maxFails) break;
         continue;
