@@ -918,6 +918,7 @@
 
   // the fail flood's stack (scanLine): one typed buffer per module, grown on
   // demand — a pixel can be pushed once per neighbour before it is visited
+  const FLOOD_CACHE_PX = 32e6;               // per band: see the flood cache in scanLine
   let flStack = new Int32Array(1 << 12);
   const growStack = (st) => { const n = new Int32Array(st.length * 2); n.set(st); return n; };
   // probe window scratch (scanLine): canvas / skip / edge planes, the flood's
@@ -1598,7 +1599,18 @@
               }
             }
           }
-          if (fcLive) { fcSteps[fcK] = { kind: 1, col, comp, right: compRight }; fcK++; }
+          // The cache is the band's, and a band nobody reads is probed by every
+          // set × phase × baseline: on a page of unread bands it grew to a
+          // gigabyte (22 sets, 2026-09 — twelve corpus workers, 11 GB). Components
+          // are kept as Int32Array (half the bytes of a JS array of the same
+          // numbers), and past FLOOD_CACHE_PX remembered pixels the cache stops
+          // growing; what it holds is still replayed, the rest is flooded live, as
+          // before there was a cache. Measured on a 3-page document no set reads:
+          // 1.32 GB / 57 s before, 0.47 GB / 66 s now.
+          if (fcLive) {
+            if ((fc.px = (fc.px | 0) + comp.length) <= FLOOD_CACHE_PX) { fcSteps[fcK] = { kind: 1, col, comp: Int32Array.from(comp), right: compRight }; fcK++; }
+            else fcLive = false;
+          }
         }
         for (const k of comp) {
           const px = k >> 16, py = k & 0xffff;
