@@ -26,7 +26,9 @@
 //
 // Which documents:  --in <dir> [--recursive] | --list <file of paths>, then
 //   --sample N [--seed S]   N of them, drawn reproducibly (a benchmark is the
-//                           same documents every time)
+//                           same documents every time) and read in the order
+//                           drawn, so a run stopped half way is still a fair
+//                           sample — report on it whenever you like
 //   --limit N               the first N
 //   --shard i/n             every n-th from the i-th (i = 1…n): one corpus
 //                           over several machines, no coordination needed
@@ -140,7 +142,7 @@ if (o.shard) { const [i, n] = o.shard; if (!(i >= 1 && i <= n)) die('--shard i/n
 if (o.sample && o.sample < paths.length) {
   let s = o.seed >>> 0; const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32);
   const pick = new Set(); while (pick.size < o.sample) pick.add(Math.floor(rnd() * paths.length));
-  paths = [...pick].sort((a, b) => a - b).map(k => paths[k]);
+  paths = [...pick].map(k => paths[k]);          // in the order drawn: whatever part of the run is done is itself a fair sample
 }
 if (o.limit) paths = paths.slice(0, o.limit);
 // the name is the identity (the resume key): the path under --in, or the base name
