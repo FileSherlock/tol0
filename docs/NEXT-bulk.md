@@ -42,12 +42,26 @@ run is done is itself a fair sample — report on it any time:
 node tools/bulk/read-report.mjs bulk-out/read-baseline-s15000 --inventory bulk-out/inventory-dataset9
 ```
 
-- `bulk-out/read-before-padevidence/` — the first **2,363** documents of that
-  sample on the engine BEFORE the underline fix (stopped on purpose: it is the
-  "before").
-- `bulk-out/read-baseline-s15000/` — the same sample, all 15,000, on the
-  engine after it. Started 02:17 on 2026-09-21, ~5 h. Its first 2,363 names
-  are the very same documents, so the two directories are a before/after.
+- `bulk-out/read-before-padevidence/` — the first **2,363** documents of the
+  sample on the engine BEFORE the underline fixes.
+- `bulk-out/read-after-padevidence/` — the first **1,375** on the engine with
+  the dot fix only (`a173aeb`).
+- `bulk-out/read-baseline-s15000/` — all 15,000 on the engine with both
+  (`eec39a2`). Started 03:03 on 2026-09-21, ~5 h.
+
+The three start with the very same documents (same seed, drawn order), so any
+two of them are a before/after on their common prefix.
+
+**Measured on the first 300 documents, line by line:**
+
+| engine | documents right | pages clean | lines clean | □ |
+|---|---:|---:|---:|---:|
+| before (`df4df79`) | 53 (17.7 %) | 93 / 436 | 69.5 % | 4,115 |
+| + a rule's pad is evidence (`a173aeb`) | 55 (18.3 %) | 97 | 70.3 % | 3,814 |
+| + underline slivers (`eec39a2`) | **99 (33.0 %)** | **169 (38.8 %)** | 71.6 % | 3,649 |
+
+No line that read clean was lost at either step, no glyph was lost, and the
+second step changed no text at all.
 
 On the old engine, first 379 documents: **18.2 % of documents right at
 tolerance 0**, 16.4 % of pages (18.9 % of rendered ones), 64.7 % of lines. (An
@@ -73,12 +87,13 @@ hunt got 92–106×) is the investment that changes this.
      show: shrinking the pad to rows that vote as the rule's AA (12 lines
      worse, two of them clean — the old "link rows regressed"), and the same
      evidence unfenced (it read a `)` under a redaction bar).
-   - **`@g` — OPEN, and now the one thing between most of those lines and
-     clean**: one pixel at (x, baseline+1) where the tail of `@` meets `g` —
-     page 247, predicted 255 (EFTA00943243 p1 y431, col 317). No rule there
-     (browsers skip ink under descenders): a glyph-raster question, probably
-     the `@` of the producer's Times build, or the `@`+`g` composite. Every
-     `…@gmail.com` has it.
+   - **the sliver at `@g` — DONE** (`eec39a2`, LAWS §9 "The underline is broken
+     where a descender crosses it…"): it was NOT a glyph question. A 64-phase
+     pen sweep with the rasterizer clone put `@` and `g` exactly on the ¼
+     lattice; the leftover pixel is a sliver of underline between two skip-ink
+     breaks. `scanLine` judges a recorded fail again at line end by its dead
+     survivors. Documents right 18.3 % → 33.0 % on 300 documents.
+   - still open inside links: `/` and a few letters (`email`'s last 4 □).
 2. **Unread bands** on the same pages (634 in the first 379 documents) — not
    yet looked at (headers in other faces? signatures?). `read-report` groups
    them by writer and line height.
@@ -99,6 +114,7 @@ hunt got 92–106×) is the investment that changes this.
 - mupdf objects are destroyed explicitly (a worker that reads a million pages
   cannot wait for GC finalizers).
 - **A rule's pad is don't-care, not blind** — see the to-do list, item 1.
+- **What is left of an underline between two descenders is still the underline** — item 1.
 
 ## Rules for running things here
 
