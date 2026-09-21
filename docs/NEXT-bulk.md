@@ -42,34 +42,55 @@ run is done is itself a fair sample — report on it any time:
 node tools/bulk/read-report.mjs bulk-out/read-baseline-s15000 --inventory bulk-out/inventory-dataset9
 ```
 
-- `bulk-out/read-before-padevidence/` — the first **2,363** documents of the
-  sample on the engine BEFORE the underline fixes.
-- `bulk-out/read-after-padevidence/` — the first **1,375** on the engine with
-  the dot fix only (`a173aeb`).
-- `bulk-out/read-baseline-s15000/` — all 15,000 on the engine with both
-  (`eec39a2`). Started 03:03 on 2026-09-21, ~5 h.
+- `bulk-out/read-baseline-s15000/` — **all 15,000, finished** (engine
+  `eec39a2`, 10.4 h on 12 workers, 0 errors / timeouts / crashes; memory never
+  above 10 GB in total, the system never below 17 GB free). Full report:
+  `bulk-out/read-baseline-s15000.report.json`.
+- `bulk-out/read-before-padevidence/` — the first 2,363 of the same sample on
+  the engine BEFORE the underline fixes; `bulk-out/read-after-padevidence/` —
+  the first 1,375 with the dot fix only (`a173aeb`). Same seed, drawn order:
+  any two are a before/after on their common prefix.
 
-The three start with the very same documents (same seed, drawn order), so any
-two of them are a before/after on their common prefix.
+(An early "77 % of lines clean" of mine was wrong: that script counted unread
+bands as clean. Use `read-report.mjs`.)
 
-**Measured on the first 300 documents, line by line:**
+## THE SCORE (fair sample of 15,000 documents, 34,416 pages)
 
-| engine | documents right | pages clean | lines clean | □ |
-|---|---:|---:|---:|---:|
-| before (`df4df79`) | 53 (17.7 %) | 93 / 436 | 69.5 % | 4,115 |
-| + a rule's pad is evidence (`a173aeb`) | 55 (18.3 %) | 97 | 70.3 % | 3,814 |
-| + underline slivers (`eec39a2`) | **99 (33.0 %)** | **169 (38.8 %)** | 71.6 % | 3,649 |
+| | |
+|---|---:|
+| **documents right at tolerance 0** | **5,359 of 15,000 — 35.7 %** (±0.8 at 95 %) |
+| pages clean | 8,838 of 34,416 — 25.7 % (28.9 % of the 30,557 rendered ones) |
+| lines clean | 376,661 of 752,262 — 50.1 % |
+| pages no set reads a glyph of | 10,761 |
+| pages skipped as not text | 3,859 (scan 2,209 · small 1,277 · blank 291 · vector 77) |
+| pages that ran out their CPU budget | 444 |
 
-No line that read clean was lost at either step, no glyph was lost, and the
-second step changed no text at all.
+Documents are mostly one page and the short ones are the e-mails that read, so
+the document score runs ahead of the page score, and the page score ahead of
+the line score (long documents in unread families weigh on lines).
 
-On the old engine, first 379 documents: **18.2 % of documents right at
-tolerance 0**, 16.4 % of pages (18.9 % of rendered ones), 64.7 % of lines. (An
-earlier "77 % of lines" of mine was wrong: that script counted unread bands as
-clean.)
+What the two underline fixes did, on the 2,363 documents both engines read:
+**documents right 20.2 % → 35.1 %**, pages clean 19.7 % → 33.7 %, 1,909 lines
+better. 11 lines of 100,000 carry one □ MORE than before — none of them was
+clean before; each is an address line that gained its dot and shows a small □
+elsewhere (same rung; the band's set pick shifts once the dot counts).
 
-Cost: ~6.6 s a page per worker with the 22-set roster and the ladder. A whole-
-corpus ladder pass is ~3 weeks on this machine as things stand: **reading
+Where the unread lines are (pages · lines clean) — each a set, or a law, to hunt:
+
+| group | pages | lines clean |
+|---|---:|---:|
+| 14 px colour (Times 16 e-mails) | 10,265 | 80.8 % — 4,149 pages clean; the rest: item 2 below |
+| 13 px colour | 2,000 | 16.6 % |
+| 12 px colour | 1,199 | 21.2 % |
+| 13 px gray | 1,010 | 10.9 % |
+| 10 px colour | 760 | 6.5 % |
+| 9 px colour | 621 | 2.3 % |
+| writers with `ArialMT` / `CourierNewPSMT` in the text layer | ~3,100 | 0–2 % — nothing reads: whole families missing |
+
+Cost: 10.8 s a page per worker on average (median 3.9 s; the 8 slowest documents
+are 16 % of all the time) with the 22-set roster and the ladder — 103 worker-
+hours for this sample. A whole-corpus ladder pass is ~5 weeks on this machine
+as things stand: **reading
 speed, not storage, is the bottleneck** — the Rust port of the reader (the
 hunt got 92–106×) is the investment that changes this.
 
