@@ -413,9 +413,7 @@ Two consequences the reader lives with:
   evidence tipped the clipped-glyph test into reading a `)` under a redaction
   bar. `email` 14 □ → 7, four lines gaining their dots and nothing else, 17
   gate documents byte-identical; 300 random corpus documents: 272 lines
-  better, none that read clean lost, 307 dots gained, no glyph lost. What
-  remains on those lines is `/` and letters inside the link, and one pixel
-  where the tail of `@` meets `g` — a glyph question, not the underline's.
+  better, none that read clean lost, 307 dots gained, no glyph lost.
 
 An underline crosses every descender of the words it underlines, so once a
 blue link is ink its underline is pieces of 1–17 px that no glyph explains;
@@ -423,13 +421,35 @@ rules of 1–2 rows are extended over the raw ink runs on their own rows within
 3 px of their ends (never a box's thin slice — that moved the space-across-a-box
 rule on six gate documents).
 
+**The underline is broken where a descender crosses it, and what is left
+between two breaks is still the underline.** A browser skips ink around every
+descender; between the break for `@` and the break for `g` of `…@gmail.com` a
+sliver survives — one pixel at 3 % coverage on the rule's row, touching the
+`g`. It looked like a glyph question (a pixel where the tail of `@` meets `g`,
+page 247, predicted 255) and was not: a pen sweep over all 64 sub-pixel
+positions with the rasterizer clone put both glyphs exactly on the ¼ lattice
+(`@` 127 of 129 pixels inside the palette band, `g` 66 of 67; one 64th either
+way, half of that) and left two pixels over, both on the underline's row at the
+two ends of the gap — and the same address on the same page, NOT underlined,
+reads with no □. At fail time the sliver's component is the still-unread `g`
+— tall, so not a rule's piece — and it was recorded. `scanLine` judges each
+record again when the line is done, by its dead survivors: survivors that lie
+on a rule's **own** rows (not the ±1 the fail-time test allows — the row over
+an underline is the baseline row, and a glyph's unexplained foot must stay a
+□), within a skip-ink gap's reach (24 px) of that rule, are the rule's.
+`email` 7 □ → 4 with its transcript untouched; 300 random corpus documents:
+**documents right at tolerance 0 55 → 99 (18.3 % → 33.0 %)**, 161 lines
+better, none worse, no text changed, no glyph gained or lost.
+
 **Re-measure:** `node test/engine.test.js` draws "ABC" in blue and in black
 through this law and asserts the converted bytes equal the black twin's, a
 three-colour blob is whitened, a neutral page passes through untouched, a
 quantized ramp yields a band that holds the true byte while a dense ramp
 yields none, and a dot beside converted ink is adopted while a colour no pen
 explains is not; and a dot resting on an underline, most of it in the rule's
-pad, is read when its pad bytes are its own and refused when they are not.
+pad, is read when its pad bytes are its own and refused when they are not;
+and a sliver of underline left against a descender is no □ once the descender
+is read, and is one where no rule runs.
 
 ## 10. The producer's law: advances, size and kerning are per document
 

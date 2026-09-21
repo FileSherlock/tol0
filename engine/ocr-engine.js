@@ -1776,6 +1776,21 @@
         if (!touch && inHalo(px, py)) touch = true;
       }
       if (maxX < 0) continue;                            // fully read by later tries
+      // …or the rule's own after all (see opts.rules). At fail time a piece of
+      // an underline is judged by its whole component, and a sliver left
+      // between two descenders hangs on the one not read yet: a browser breaks
+      // a link's underline around '@' and around 'g', and what survives
+      // between them — one pixel at 3 % on the rule's row — floods into the
+      // 'g'. Once the 'g' is read the survivors ARE the piece: on the rule's OWN
+      // rows — not the ±1 the fail-time test allows: the row over an underline
+      // is the baseline row, and a glyph's unexplained foot must stay a □ —
+      // within a skip-ink gap's reach of that rule.
+      // Every underlined "…@gmail.com" of the corpus kept one □ for this.
+      if (rules) {
+        let sy0 = 1e9, sy1 = -1;
+        for (const k of dead) { const py = k & 0xffff; if (py < sy0) sy0 = py; if (py > sy1) sy1 = py; }
+        if (rules.some(q => sy0 >= q.y0 && sy1 < q.y1 && minX <= q.x1 + 24 && maxX >= q.x0 - 24)) continue;
+      }
       const frag = maxX - minX < 13 &&
         (touch || (lastFragRight >= 0 && minX - lastFragRight <= 4));
       if (frag) {

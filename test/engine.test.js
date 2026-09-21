@@ -392,6 +392,32 @@ test("scanLine: a dot resting on an underline is read — a byte that sits in th
   assert.deepStrictEqual(L2.glyphs.map(g => g.ch), ['A', 'B', 'C']);
 });
 
+test("scanLine: a sliver of underline left against a descender is the rule's own once the descender is read", () => {
+  // A browser breaks a link's underline around every descender. Between two
+  // breaks — '@' and 'g' of "…@gmail.com" — a sliver survives: one pixel at
+  // 3 % on the rule's row, touching the 'g'. At fail time its component IS the
+  // unread 'g' (tall: not a rule's piece), so it was recorded; judged again
+  // when the line is done, its survivors are the sliver alone.
+  const g = makeGlyph('g', ['.###.', '#...#', '#...#', '.####', '....#', '#...#', '.###.'], { dy: -4, adv: 6 });
+  const set = makeSet('synth', [...abcSet().byPhy.get(0), g]);
+  const page = makePage(160, 30), W = 160, B = 20, R = B + 1, pen = 60;          // the rule one row under the baseline
+  drawWord(page, set, 'AB', [10, 16], B);
+  drawGlyph(page, g, pen, B);
+  drawWord(page, set, 'C', [70], B);
+  for (let x = 6; x < pen - 3; x++) page.gray[R * W + x] = 0;                     // the underline, broken around the 'g'…
+  for (let x = pen + 8; x < 140; x++) page.gray[R * W + x] = 0;
+  page.gray[R * W + pen - 1] = 247;                                               // …and the sliver, touching its descender
+  const det = E.detectObjects(page);
+  const rules = det.objects.filter(o => o.type === 'rule');
+  assert.strictEqual(rules.length, 2, 'two pieces of one underline');
+  const L = E.scanLine(page, det.mask, set, 0, B, 0, W, Infinity, Infinity, 0, null, new Uint8Array(W * 30), null, null, null, { rules });
+  assert.deepStrictEqual(L.glyphs.map(x => x.ch), ['A', 'B', 'g', 'C']);
+  assert.strictEqual(L.fails.length, 0, "the sliver is the underline's, not a □");
+  // the same pixel with no rule on its rows is ink nobody explains
+  const bare = E.scanLine(page, det.mask, set, 0, B, 0, W, Infinity, Infinity, 0, null, new Uint8Array(W * 30), null, null, null, { rules: [] });
+  assert.strictEqual(bare.fails.length, 1);
+});
+
 // ---- colourInk (LAWS §9) ----
 // A coloured pen composites over white per channel, page_c = (65280 −
 // (255 − C_c)·e) >> 8 — so a blue word is the black word seen through the

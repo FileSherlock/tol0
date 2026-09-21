@@ -12,13 +12,13 @@ Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
 |---|---:|---:|---:|
 | v3 | 1,785 | 122,886 | 0 |
 | big | 18,307 | 1,338,833 | 0 |
-| email | 1,908 | 113,745 | 7 (7 coloured) |
+| email | 1,908 | 113,745 | 4 (4 coloured) |
 | report | 34 | 2,034 | 2 |
 | courier_1 | 1,552 | 114,817 | 0 |
 | courier_2 | 4,899 | 374,462 | 0 |
 | nimbusrom | 223 | 13,034 | 161 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| **total** | **33,736** | **2,436,390** | **170 (142 coloured)** |
+| **total** | **33,736** | **2,436,390** | **167 (139 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
 not the reader's. The 11 `nimbus791` documents also carry truth transcripts, and every one
@@ -29,7 +29,7 @@ letter-exact and space-exact, 0 rows differing.
 
 Since 2026-09-03 coloured ink is read as coverage ([LAWS §9](../../docs/LAWS.md#9-coloured-ink-is-coverage))
 instead of being whitened, and the summary counts the clusters that lie in
-coloured ink apart: **142 of the 170 □ are coloured** — the blue Helvetica-bold
+coloured ink apart: **139 of the 167 □ are coloured** — the blue Helvetica-bold
 section headings of `nimbusrom` (a face its pool does not carry) and the
 underlined blue links of `email` (a palette-quantized ramp, exact only at the
 ladder's tolerant rungs). They were always on the page; before, the reader
@@ -48,9 +48,22 @@ on white paper now counts as evidence for a glyph that touches nothing else
 its dots and nothing else — `visacentral.com`, `www.americanexpress.com`,
 `www.adobe.com/…/readstep.html`, `jeevacation@gmail.com` — and the other 17
 documents are byte-identical. On 300 randomly drawn corpus documents: 272
-lines better, none that read clean lost, 307 dots gained, no glyph lost. The 7
-that remain are `/` and letters inside the same links, and one pixel where the
-tail of `@` meets `g`.
+lines better, none that read clean lost, 307 dots gained, no glyph lost.
+
+**The same day: 7 □ → 4, the transcript untouched.** Three of the seven were
+not unread ink either. A browser breaks a link's underline around every
+descender, and between two breaks — the `@` and the `g` of `…@gmail.com` — a
+sliver of it survives: one pixel at 3 % on the rule's row, touching the `g`.
+(It looked like a glyph question; a 64-phase pen sweep with the rasterizer
+clone put `@` and `g` exactly on mupdf's ¼ lattice, 127/129 and 66/67 pixels
+inside the palette band, and left two pixels over — both on the underline's
+row, at the two ends of the gap.) At fail time the sliver's component is the
+still-unread `g`, so it is recorded; `scanLine` now judges the record again
+when the line is done: survivors that lie on a rule's OWN rows, within a
+skip-ink gap's reach of it, are the rule's. 300 random corpus documents:
+**documents right at tolerance 0 55 → 99 (18.3 % → 33.0 %)**, pages clean
+97 → 169, 161 lines better, none worse, no text changed. The 4 that remain in
+`email` are `/` and letters inside the links.
 
 A □ is ink the reader refused to guess at, so the count is only meaningful if
 someone has looked at what is under it. Censused from page pixels 2026-07-26.
