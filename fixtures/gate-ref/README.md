@@ -5,19 +5,20 @@ document and byte-compares its whole transcript (`<name>.txt`) and its counts
 (`<name>.summary`) against the file next to this one. There is no assertion to
 tune and no threshold to argue about: any change in any number is the signal.
 
-Recorded 2026-07-26 (step 4 of the port), 18 documents:
+Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
+2026-09-21 — see below):
 
 | | lines | glyphs | □ |
 |---|---:|---:|---:|
 | v3 | 1,785 | 122,886 | 0 |
 | big | 18,307 | 1,338,833 | 0 |
-| email | 1,908 | 113,738 | 14 (14 coloured) |
+| email | 1,908 | 113,745 | 7 (7 coloured) |
 | report | 34 | 2,034 | 2 |
 | courier_1 | 1,552 | 114,817 | 0 |
 | courier_2 | 4,899 | 374,462 | 0 |
 | nimbusrom | 223 | 13,034 | 161 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| **total** | **33,736** | **2,436,383** | **177 (149 coloured)** |
+| **total** | **33,736** | **2,436,390** | **170 (142 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
 not the reader's. The 11 `nimbus791` documents also carry truth transcripts, and every one
@@ -28,7 +29,7 @@ letter-exact and space-exact, 0 rows differing.
 
 Since 2026-09-03 coloured ink is read as coverage ([LAWS §9](../../docs/LAWS.md#9-coloured-ink-is-coverage))
 instead of being whitened, and the summary counts the clusters that lie in
-coloured ink apart: **149 of the 177 □ are coloured** — the blue Helvetica-bold
+coloured ink apart: **142 of the 170 □ are coloured** — the blue Helvetica-bold
 section headings of `nimbusrom` (a face its pool does not carry) and the
 underlined blue links of `email` (a palette-quantized ramp, exact only at the
 ladder's tolerant rungs). They were always on the page; before, the reader
@@ -36,6 +37,20 @@ said nothing about them. The 29 neutral □ are the 40 of the census below minus
 the letterhead clusters that the census itself called coloured (they are now
 counted as such; 28 with the two phantom bands below removed). The census
 stands as written for the neutral ink.
+
+**2026-09-21: `email` 14 □ → 7.** Half of `email`'s □ were not the palette's
+doing at all: they were the **dots** of its underlined links. A browser draws a
+link's underline one row under the glyphs' feet, a rule is masked with a ±2-row
+don't-care pad, and a `.` has 7 of its 9 pixels in that pad — too little
+evidence, and it was refused. A byte that sits in a lone rule's pad exactly as
+on white paper now counts as evidence for a glyph that touches nothing else
+(`detectObjects` mask 4, `scanLine` tryCand). Four lines changed, each gaining
+its dots and nothing else — `visacentral.com`, `www.americanexpress.com`,
+`www.adobe.com/…/readstep.html`, `jeevacation@gmail.com` — and the other 17
+documents are byte-identical. On 300 randomly drawn corpus documents: 272
+lines better, none that read clean lost, 307 dots gained, no glyph lost. The 7
+that remain are `/` and letters inside the same links, and one pixel where the
+tail of `@` meets `g`.
 
 A □ is ink the reader refused to guess at, so the count is only meaningful if
 someone has looked at what is under it. Censused from page pixels 2026-07-26.

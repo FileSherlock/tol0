@@ -33,12 +33,12 @@ email.
 services.
 >
 > To learn what documents may be required for your international destination, or to obtain visa or passport
-services, go to http://visacentral com amex to access the online services of VisaCentral and to receive
+services, go to http://visacentral.com amex to access the online services of VisaCentral and to receive
 discounted rates on travel document services. To contact VisaCentral by phone, call 866-529-  553.
 >
 > You may receive customer service emails even if you have requested not to receive email marketing offers
 from American Express. For details about our e-mail practices, please review the American Express Privacy
-Statement at http://www americanexpress com/privacy.
+Statement at http://www.americanexpress.com/privacy.
 >
 > See attached itinerary PDF or link for full terms and conditions.
 >
@@ -46,7 +46,7 @@ Statement at http://www americanexpress com/privacy.
 > If you are unable to view the PDF attachment, ensure you have Adobe Acrobat Reader. Refer to website
 below to download and install this free software.
 >
-> http://www a  obe com/products acrobat/readstep html
+> http://www.a  obe.com/products acrobat/readstep.html
 >
 > Thank you for choosing American Express Centurion Travel Service and have a pleasant trip.
 >
@@ -1903,6 +1903,6 @@ Unauthorized use, disclosure or copying of this
 communication or any part thereof is strictly prohibited
 and may be unlawful. If you have received this
 communication in error, please notify us immediately by
-return e-mail or by e-mail to jeevacation@gmail com, and
+return e-mail or by e-mail to jeevacation@gmail.com, and
 destroy this communication and all copies thereof,
 including all attachments. copyright -all rights reserved

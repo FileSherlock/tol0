@@ -508,11 +508,30 @@
         : Math.max(0, o.y0 - 2);
       const y1 = o.type === 'box' ? (o.y1 < h && edgeRow(o.y1) ? o.y1 + 1 : o.y1)
         : Math.min(h, o.y1 + 2);
+      // A RULE's pad rows are marked 4, its own rows 1. Both are don't-care to
+      // the scan exactly as before; 4 only says "the rule may have no ink
+      // here": where a glyph's byte sits there EXACTLY as on white paper, that
+      // is evidence for the glyph (scanLine tryCand). The '.' of an underlined
+      // "gmail.com" rests on the underline — 7 of its 9 pixels in the pad — and
+      // was refused for want of evidence, on every such line of the corpus.
+      // (Shrinking the pad instead — rows that do not vote as the rule's AA —
+      // read those dots too, and broke 27 lines of 10,000 that read clean:
+      // on some pages the row over an underline IS a composite zone.)
+      // …and only for a rule that stands alone: a redaction box's thin slice is
+      // typed 'rule' too, and evidence in ITS pad tipped the clipped-glyph test
+      // into reading a ')' under a bar (EFTA00368282 p2) — LAWS §8's ground.
+      const tall = b => !b.vr && b.y1 - b.y0 > 4;
+      const lone = o.type === 'rule' && !objects.some(b => b !== o && (b.type === 'box' || (b.type === undefined && tall(b))) &&
+        b.x1 > o.x0 - 3 && b.x0 < o.x1 + 3 && b.y1 > o.y0 - 4 && b.y0 < o.y1 + 4);
       for (let y = y0; y < y1; y++) {
         mRows[y] = 1;
         (rowIvs[y] ??= []).push([x0, x1]);
-        for (let x = x0; x < x1; x++)
-          mask[y * w + x] = o.type === 'box' ? 2 : 1;
+        const pad = lone && (y < o.y0 || y >= o.y1);
+        for (let x = x0; x < x1; x++) {
+          const i = y * w + x;
+          if (pad) { if (!mask[i]) mask[i] = 4; }
+          else mask[i] = o.type === 'box' ? 2 : 1;
+        }
       }
       if (o.type === 'box') {
         // edge lines (EDGE MODEL above): from each side's padded boundary walk
@@ -1093,7 +1112,7 @@
                 if (lin && ev >= 129 && ev !== 255) shifts[co + x] = 1;
               } else {                                 // body, rule, dust: don't-care
                 canvas[co + x] = g[po + x];
-                skip[co + x] = mask[po + x] === 2 ? 3 : 1;
+                skip[co + x] = mask[po + x] === 2 ? 3 : mask[po + x] === 4 ? 4 : 1;
               }
             } else if (judged && !okAt(po + x, 255, 0)) unexpl[x - xFrom]++;
           }
@@ -1179,7 +1198,7 @@
       if (gx < xFrom || gx + g.w > xTo || gy < y0 || gy + g.h > y1) return null;
       // must explain the anchor column itself (hoisted: cheap reject)
       if (col < gx || col >= gx + g.w) return null;
-      let exact = 0, pending = 0, skipped = 0, foreign = false;
+      let exact = 0, pending = 0, skipped = 0, foreign = false, padExact = 0, padAnchor = 0, boxN = 0;
       const linG = g.lin ?? lin;
       const { inkC, inkR, inkB, inkA } = g, nInk = inkC.length;
       const rowBase = gy * W + gx, canBase = (gy - y0) * bw + (gx - xFrom);
@@ -1189,7 +1208,11 @@
         const cc = inkC[k], rr = inkR[k];
         const pOff = rowBase + rr * W + cc;
         const ci = canBase + rr * bw + cc, sk = skip[ci];
-        if (sk) { skipped++; if (sk !== 3) foreign = true; continue; }  // object/absorbed pixel: no evidence either way
+        if (sk === 4 && okAt(pOff, inkB[k], TOL)) {          // a rule's pad row, and the glyph's byte as on white paper:
+          padExact++; if (cc === anchorRel) padAnchor++;    // held back — it counts only if the glyph touches nothing else (below)
+          continue;
+        }
+        if (sk) { skipped++; if (sk !== 3) foreign = true; if (sk === 3) boxN++; continue; }  // object/absorbed pixel: no evidence either way
         if (isEdge[ci]) edgeN++;
         else if (canvas[ci] === 0) overlap++;            // composite over black: any glyph passes, no evidence
         const gb = inkB[k], pv = page.gray[pOff], cv = canvas[canBase + rr * bw + cc];
@@ -1259,6 +1282,15 @@
       // pending is for kern overlap (a few columns) — a glyph "hiding" inside
       // solid ink shows up as mostly-pending and must not be accepted; a glyph
       // mostly inside an object mask has no evidence and is rejected too
+      // a rule's pad (mask 4): the bytes that sat there exactly as on white paper
+      // are this glyph's evidence — for a glyph that touches no box, no bar
+      // edge, no absorbed or foreign cell. Anything else keeps them what they
+      // always were: don't-care. (A clipped read under a bar must not be talked
+      // into existence by a rule's pad; the dot on an underline must be read.)
+      if (padExact) {
+        if (!boxN && !edgeN && !foreign && !overlap) { exact += padExact; anchorHit += padAnchor; }
+        else { skipped += padExact; foreign = true; }
+      }
       const considered = nInk - skipped;
       let clipped = false, shadow = false;
       // VISIBLE ink is what lies on the open page; an edge composite supports

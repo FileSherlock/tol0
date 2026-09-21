@@ -393,10 +393,29 @@ Two consequences the reader lives with:
   makes. Without it `visacentral.com` reads `v sacentral com`.
 - What still does not read is an honest □, counted apart in the summary as
   *coloured ink* so a document's neutral-text □ stays comparable. On `email`
-  the remaining 14 are periods and commas that sit entirely inside an
-  underline's ±2-row padding — the blanket pad rules keep on purpose
+  there were 14: periods and commas that sit inside an underline's ±2-row
+  padding — the blanket pad rules keep on purpose
   ([§8](#8-redaction-boxes-a-black-body-and-edges-that-keep-the-glyph) made it
-  adaptive for boxes only; link rows regressed when rules went adaptive).
+  adaptive for boxes only; link rows regressed when rules went adaptive, and
+  did again in 2026-09: a pad shrunk to the rows that vote as the rule's AA
+  read the dots and broke 12 corpus lines of 10,000, two of them clean — on
+  some pages the row over an underline IS a composite zone).
+- **A pad is don't-care, not blind.** The pad stays. But a byte that sits in a
+  lone rule's pad *exactly as the glyph would leave it on white paper* is
+  evidence for that glyph: the rule has no ink there, or the byte would not be
+  the glyph's. `detectObjects` marks a rule's pad rows apart from its own
+  (mask 4, and only for a rule with no box over, under or across it — a
+  redaction's thin slice is typed `rule` too); `scanLine` counts such bytes
+  for a candidate that touches no box, no bar edge, no absorbed or foreign
+  cell, and leaves every other pad byte what it was. A `.` on a link's
+  underline has 7 of its 9 pixels in the pad and was refused for want of
+  evidence; it reads now. Fenced because it must be: unfenced, the same
+  evidence tipped the clipped-glyph test into reading a `)` under a redaction
+  bar. `email` 14 □ → 7, four lines gaining their dots and nothing else, 17
+  gate documents byte-identical; 300 random corpus documents: 272 lines
+  better, none that read clean lost, 307 dots gained, no glyph lost. What
+  remains on those lines is `/` and letters inside the link, and one pixel
+  where the tail of `@` meets `g` — a glyph question, not the underline's.
 
 An underline crosses every descender of the words it underlines, so once a
 blue link is ink its underline is pieces of 1–17 px that no glyph explains;
@@ -409,7 +428,8 @@ through this law and asserts the converted bytes equal the black twin's, a
 three-colour blob is whitened, a neutral page passes through untouched, a
 quantized ramp yields a band that holds the true byte while a dense ramp
 yields none, and a dot beside converted ink is adopted while a colour no pen
-explains is not.
+explains is not; and a dot resting on an underline, most of it in the rule's
+pad, is read when its pad bytes are its own and refused when they are not.
 
 ## 10. The producer's law: advances, size and kerning are per document
 

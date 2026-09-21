@@ -21,7 +21,7 @@
 //            pages the inventory classes as scan, small, blank or vector are
 //            skipped (and recorded as skipped), a document with no rendered
 //            page is not opened at all.
-//            --page-budget S   seconds a page may take under --ladder (default
+//            --page-budget S   CPU seconds a page may take under --ladder (default
 //            120; 0 = none): it keeps the best rung that finished.
 //
 // Which documents:  --in <dir> [--recursive] | --list <file of paths>, then

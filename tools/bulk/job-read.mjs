@@ -20,10 +20,13 @@
 // item.skip = { pageNumber: class } — pages the inventory says are not rendered
 // text (scan, small, blank, vector: tools/bulk/classify.mjs). They are not
 // read; the record keeps { pno, skipped: class } so nothing is silently missing.
-// config.pageBudgetS — a page is given this long (ladder only; the engine
-// yields between bands, which is where the clock is looked at). Past it the
-// page keeps the best rung that finished, or nothing, and says { budget: true }:
-// a handful of pages cost minutes each and read nothing (2 bands, 40 s).
+// config.pageBudgetS — a page is given this much CPU time (ladder only; the
+// engine yields between bands, which is where the clock is looked at). Past it
+// the page keeps the best rung that finished, or nothing, and says
+// { budget: true }: a handful of pages cost minutes each and read nothing
+// (2 bands, 40 s). CPU time, not wall time: on a wall clock the same page read
+// whole on a quiet machine and a rung short on a busy one, and a second run
+// sharing the cores looked like an engine regression.
 // config: { glyphs: [set | a+b union, …], ladder, pageBudgetS, tol, quant, palette, shadow, matchcols, union }
 // One record per document:
 //   { name, sha, pages, tot: { lines, clean, unread, glyphs, fails, frags, colour },
@@ -83,11 +86,12 @@ async function read(item, config, sets, bytes, doc) {
       // of 'all' are exactly for such pages).
       const ran = new Map();
       const NOBODY = Symbol('nobody reads this page'), BUDGET = Symbol('over its time');
-      const deadline = config.pageBudgetS ? Date.now() + config.pageBudgetS * 1000 : Infinity;
+      const cpu = () => { const u = process.cpuUsage(); return (u.user + u.system) / 1000; };
+      const deadline = config.pageBudgetS ? cpu() + config.pageBudgetS * 1000 : Infinity;
       let got;
       try {
         got = await B.readPageAuto(page, sets, { passes, carry: docCarry, passHint: lastPass && passes.find(p => passKey(p) === lastPass),
-          progress() { if (Date.now() > deadline) throw BUDGET; },
+          progress() { if (cpu() > deadline) throw BUDGET; },
           onPass(p, r) {
             ran.set(passKey(p), { p, r, glyphs: r.lines.reduce((n, L) => n + L.glyphs.length, 0),
               fails: r.lines.reduce((n, L) => n + L.fails.length, 0) + r.lines.filter(L => !L.set && !L.fragOnly).length });

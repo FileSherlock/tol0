@@ -355,6 +355,43 @@ test("scanLine: a rule's pieces on a page that cannot hold their byte are retire
   assert.strictEqual(L.fails.length, 0, "the piece is the rule's own: absorbed, no □");
 });
 
+test("scanLine: a dot resting on an underline is read — a byte that sits in the rule's pad as on white paper is evidence", () => {
+  // "AB.C" underlined as a browser underlines a link: the rule one row under
+  // the glyphs' feet. Letters are rows 15–19, the dot rows 17–19, the rule row
+  // 20, its ±2 pad rows 18–19 and 21–22: the letters keep three open rows of
+  // five, the dot ONE of three — 2 open pixels of 6, as the real one has 2 of
+  // 9. Masked cells were no evidence either way, so the dot had too little
+  // and was refused: every underlined "gmail.com" of the corpus lost its dot
+  // to this, and the line its certificate.
+  const dot = makeGlyph('.', ['##', '##', '##'], { dy: -3, adv: 4 });
+  const set = makeSet('synth', [...abcSet().byPhy.get(0), dot]);
+  const draw = () => {
+    const page = makePage(140, 30);
+    drawWord(page, set, 'AB', [10, 16], 20);
+    drawGlyph(page, dot, 22, 20);
+    drawWord(page, set, 'C', [26], 20);
+    for (let x = 6; x < 70; x++) page.gray[20 * 140 + x] = 0;
+    return page;
+  };
+  const read = page => {
+    const det = E.detectObjects(page);
+    const rules = det.objects.filter(o => o.type === 'rule');
+    assert.deepStrictEqual([rules[0].y0, rules[0].y1], [20, 21]);
+    assert.ok(det.mask[19 * 140 + 22] && det.mask[18 * 140 + 22] && !det.mask[17 * 140 + 22], "rows 18–19 are the rule's pad, 17 is open");
+    return E.scanLine(page, det.mask, set, 0, 20, 0, 140, Infinity, Infinity, 0, null, null, null, null, null, { rules });
+  };
+  const L = read(draw());
+  assert.deepStrictEqual(L.glyphs.map(g => g.ch), ['A', 'B', '.', 'C']);
+  assert.strictEqual(L.fails.length, 0);
+  // a pad byte that is NOT the glyph's is what it always was — don't-care, no
+  // evidence: the composite zone over a real underline costs nothing new
+  const off = draw();
+  for (const y of [18, 19]) for (const x of [22, 23]) off.gray[y * 140 + x] -= 3;      // every pad pixel of the dot a composite's worth off
+  const L2 = read(off);
+  assert.ok(!L2.glyphs.some(g => g.ch === '.'), 'too little evidence again: refused, as before');
+  assert.deepStrictEqual(L2.glyphs.map(g => g.ch), ['A', 'B', 'C']);
+});
+
 // ---- colourInk (LAWS §9) ----
 // A coloured pen composites over white per channel, page_c = (65280 −
 // (255 − C_c)·e) >> 8 — so a blue word is the black word seen through the
