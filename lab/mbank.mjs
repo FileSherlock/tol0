@@ -127,7 +127,7 @@ function roster() {
   FONT_DIRS.forEach((dir, di) => {
     if (!existsSync(dir)) return;
     const d = dir.replace(/\/$/, '');
-    const tag = TAGS[di] ?? '';
+    const tag = TAGS[di] ?? `x${di - 2}:`;           // TOL0_FONT_DIRS extras: another directory is another build
     for (const f of readdirSync(d).sort()) {
       if (/\.(ttf|cff)$/i.test(f)) add(`${tag}${f.replace(/\.(ttf|cff)$/i, '')}`, `${d}/${f}`, tag || 'win');
       else if (/\.ttc$/i.test(f)) {

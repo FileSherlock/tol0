@@ -94,9 +94,33 @@ hunt got 92–106×) is the investment that changes this.
      breaks. `scanLine` judges a recorded fail again at line end by its dead
      survivors. Documents right 18.3 % → 33.0 % on 300 documents.
    - still open inside links: `/` and a few letters (`email`'s last 4 □).
-2. **Unread bands** on the same pages (634 in the first 379 documents) — not
-   yet looked at (headers in other faces? signatures?). `read-report` groups
-   them by writer and line height.
+2. **The sans-serif e-mail body — the next big lever, and a real hunt.** Of
+   ~4,000 pages read, **358 have unread bands as their ONLY defect**, 206 of
+   them just one or two: a Times header that reads (`From: … Sent: …`) over a
+   body nobody reads. Cropped, the body is a sans face of the Arial/Helvetica
+   kind with ~13 px lines (EFTA00432247 p1 y207, EFTA00414609 p1 y185,
+   EFTA00841850 p1). What is known:
+   - not `arial.ttf` at em64 832, 853 or 896 (sets generated to scratch and
+     handed to `blind-read` as `.npz` paths: nothing reads);
+   - `lab/mbank.mjs scan`, bank of 380 + 19 Windows faces × 23 sizes × 4
+     phases: **no `m` matches, exact or `--tol1`**, on 5 of 6 such documents
+     (the 6th names the Times header);
+   - `hunt harvest` on one page gives 16 targets but merged components among
+     them (an `o` 16 px wide — sans glyphs touch, and the text layer's labels
+     are loose), so `hunt sweep`'s dimension probe rejects every face,
+     including Times. A proper hunt needs targets from MANY pages of the
+     family, and probably the anisotropic probe (`hunt probe --ex --ey`): no
+     isotropic size of any face has these dimensions, which smells like text
+     scaled after rendering — check against the old page-downscale work
+     (branches `downscale-repro-08-04` / `page-downscale-payload` live only on
+     the retired JaguarM remote and in `~/Desktop/tol0-old-git-history-2026-09-20`).
+   The lab now runs under Linux: `TOL0_WINDOWS_FONTS` / `TOL0_USER_FONTS` stand
+   in for the two Windows font folders (same positions, same bank names):
+   ```bash
+   export TOL0_WINDOWS_FONTS=/run/media/jaguarm/System2/Windows/Fonts
+   export TOL0_USER_FONTS=/run/media/jaguarm/System2/Users/yanni/AppData/Local/Microsoft/Windows/Fonts
+   node lab/mbank.mjs build        # 11 s, 38,548 templates
+   ```
 3. **Slow pages**: the 8 slowest documents are ~30 % of all read time; unread
    bands are the most expensive thing the reader does (every set × phase ×
    baseline, and nothing to show for it).

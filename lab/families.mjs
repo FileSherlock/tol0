@@ -31,6 +31,7 @@
 // ¼-px engine cannot match. Carries the fingerprint that identifies it and
 // what to do about it.
 import { existsSync } from 'node:fs';
+import { delimiter } from 'node:path';
 
 // ---------------------------------------------------------------- font paths
 // METHOD rule 3 in code: Windows installs fonts PER USER as well as globally,
@@ -38,10 +39,23 @@ import { existsSync } from 'node:fs';
 // C:/Windows/Fonts alone is HALF the machine. That gap hid DejaVu Serif for a
 // week and then wrote off TimesNewRoman8 as a lost artifact. Both directories,
 // always — and `face()` reports which one answered.
+//
+// The roster is a WINDOWS roster — the corpus's producers ran there — and the
+// machine that hunts need not be: on a dual boot the same two directories are a
+// mounted partition away. TOL0_WINDOWS_FONTS and TOL0_USER_FONTS stand in for
+// them, in the same POSITIONS (mbank tags faces by position: '', 'u:', 'lab:'),
+// so a bank built under Linux names its faces exactly as one built under
+// Windows does. TOL0_FONT_DIRS (path-delimiter separated) adds directories
+// after the three; their faces are tagged x1:, x2:, … — an `arial.ttf` from a
+// distribution's core-fonts package is another build, and must not pass for
+// the system's. Without any of them a Linux machine knows the nine faces in
+// ../fonts and nothing else, and says "no m matched" to every document.
+const envDir = k => (process.env[k] ?? '').replace(/\\/g, '/');
 export const FONT_DIRS = [
-  'C:/Windows/Fonts',
-  `${(process.env.LOCALAPPDATA ?? '').replace(/\\/g, '/')}/Microsoft/Windows/Fonts`,
+  envDir('TOL0_WINDOWS_FONTS') || 'C:/Windows/Fonts',
+  envDir('TOL0_USER_FONTS') || `${envDir('LOCALAPPDATA')}/Microsoft/Windows/Fonts`,
   new URL('../fonts/', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
+  ...envDir('TOL0_FONT_DIRS').split(delimiter).filter(Boolean),
 ];
 
 /** Resolve a bare font file name against every roster directory. Returns null
