@@ -161,6 +161,55 @@ hunt got 92–106×) is the investment that changes this.
 - **A rule's pad is don't-care, not blind** — see the to-do list, item 1.
 - **What is left of an underline between two descenders is still the underline** — item 1.
 
+## EFTA00173953 — the "multiple days" document (2026-09-23)
+
+A 69-page FBI OCDETF memo the app roster read nothing of. Two days, one family:
+**a Word document whose Times New Roman was never embedded**, so the eDiscovery
+chain's mupdf drew its builtin URW Nimbus Roman — `nimbusromlin942` in
+`lab/families.mjs` (11 pt body = em64 942; 10 pt = 849; small caps 768; the red
+8 pt warning = 685), linear law, a palette per page. Registry pool
+`nimbusrom942`; gate entry `fbimemo` holds the read still: **978 lines, 46,721
+glyphs, 3,807 □** (from 5,598 before the residue rule). Not a clean document
+— a family, seven free sets, and a method:
+
+- **Every lab prefilter was blind.** `mbank scan`, `identify`, `sweep` compare
+  `law(coverage)` to the page; a palettized page holds `Q(law(coverage))`, and
+  62 % of the corpus is palettized. `lab/palettesweep.mjs` applies the page's
+  own palette before comparing (lab/README.md, METHOD rule 9). **Re-run the
+  item-2 hunt (the sans e-mail body) through it before believing its "no `m`
+  matches".**
+- **The law-free fit** (isotonic residual of coverage → byte, each target at its
+  own ¼-px phase) named Nimbus Roman out of 792 faces at 0.0–0.1 bytes; the
+  nearest impostor was at 3. Refuted on the way, with the numbers in the
+  transcript: hinted FreeType (v35/v40/light/auto), GDI, high-resolution
+  render + downscale, Liberation Serif, three Times New Roman builds,
+  Ghostscript and poppler renders.
+- **Graphic residue** (LAWS §9): the agency seal was 2,700 of the 5,598 □.
+  What survives whitening inside an emblem is masked now; `nimbusrom` 161 → 155.
+
+What is still □ in it, each an engine item with its own commit:
+
+1. **Coloured text through the linear law** — the red warning blocks (415 □).
+   Nimbus at em64 685 reads 481 of their glyphs at ±2 and none at 0:
+   `colourInk` converts colour to a gray pen but does not apply this family's
+   +1 post-law on the colour channels. LAWS §9 needs a paragraph and the
+   converter a flag the pool can set.
+2. **The seal's converted parts** (~900 □, ~13 a page): its colours that DO
+   convert through some pen survive as ink no set reads. The residue rule
+   only sees what was whitened.
+3. **Checkboxes** — Zapf Dingbats. mupdf's builtin URW Dingbats is inside
+   `node_modules/mupdf/dist/mupdf-wasm.wasm`, not in `fonts/`; extract, verify
+   the licence (it is URW base-35, free), generate at 942.
+4. **Black redaction blocks** with text beneath: the text layer has words
+   there; `hunt harvest` returns their bytes as targets — a harvest must skip
+   components that are one dark rectangle (the "fbi2" harvest was all that).
+5. Table borders and a few touching italic pairs.
+
+The sibling search — 741 corpus documents with the same text-layer font
+signature, first pages read — found no second document of this family; the
+signature is the OCR tool's, not the producer's. This family is a method
+result more than a corpus lever.
+
 ## Rules for running things here
 
 The first full inventory took the desktop session down (16 leaking workers,
@@ -180,3 +229,5 @@ on a few hundred corpus documents (leave out pages marked `budget`).
 - Recto's copies of `engine/blindocr.js` and `engine/ocr-engine.js` are stale
   (`npm run sync:recto:check`). Not synced — that is the user's call.
 - Nothing from this work is pushed.
+- `fixtures/corpus/EFTA00173953.pdf` is gitignored (the memo is public, but not
+  ours to redistribute here); the `fbimemo` gate entry skips without it.
