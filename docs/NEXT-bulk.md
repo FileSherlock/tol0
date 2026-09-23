@@ -168,9 +168,10 @@ A 69-page FBI OCDETF memo the app roster read nothing of. Two days, one family:
 chain's mupdf drew its builtin URW Nimbus Roman — `nimbusromlin942` in
 `lab/families.mjs` (11 pt body = em64 942; 10 pt = 849; small caps 768; the red
 8 pt warning = 685), linear law, a palette per page. Registry pool
-`nimbusrom942`; gate entry `fbimemo` holds the read still: **978 lines, 46,721
-glyphs, 3,807 □** (from 5,598 before the residue rule). Not a clean document
-— a family, seven free sets, and a method:
+`nimbusrom942`; gate entry `fbimemo` holds the read still: **1,075 lines,
+47,583 glyphs, 3,014 □** (5,598 before the residue rule; 3,807 before LAWS
+§13). Not a clean document — a family, seven free sets, two reader rules,
+and a method:
 
 - **Every lab prefilter was blind.** `mbank scan`, `identify`, `sweep` compare
   `law(coverage)` to the page; a palettized page holds `Q(law(coverage))`, and
@@ -186,8 +187,25 @@ glyphs, 3,807 □** (from 5,598 before the residue rule). Not a clean document
   Ghostscript and poppler renders.
 - **Graphic residue** (LAWS §9): the agency seal was 2,700 of the 5,598 □.
   What survives whitening inside an emblem is masked now; `nimbusrom` 161 → 155.
+- **Black text, by cause** (`census`: every □ classed by the pixels around
+  it and labelled by the text layer, 2026-09-24): 1,105 black-text □ before,
+  **435** after — ~900 of them were the date and count columns of the tables
+  on pages 20–26, cells on their own baselines in one band (LAWS §13 side
+  lines), and 148 → 36 were the tables' horizontal borders, lost where they
+  crossed a redacted column (LAWS §13 crossing rules). Corpus A/B, 300
+  documents: 4 better, 0 worse, 212 lines better, time unchanged.
 
-What is still □ in it, each an engine item with its own commit:
+What is still □ in it — black text first, as asked:
+
+0. **Black text, 435 □:** bullets (56: Word's `■`, a Symbol/Dingbats glyph
+   no set has — mupdf's URW Dingbats is inside its wasm, not in `fonts/`);
+   single-glyph cells (the count column `1`, `S`/`P`/`F` on p26 — one fail
+   is not a run, so the side probe skips it; relax to isolated single fails
+   beside the line and measure the probe cost); p26's right-hand column
+   (111 □, a table whose cells the side probe does not yet reach — look);
+   the bold header/footer line on p55+ reads garbled (`SSl'VEBUUNS`: a
+   different phase or a scan?); the p1 agency strip (no text layer: logos).
+   The coloured and residue classes below are not black text and wait.
 
 1. **Coloured text through the linear law** — the red warning blocks (415 □).
    Nimbus at em64 685 reads 481 of their glyphs at ±2 and none at 0:
@@ -209,6 +227,72 @@ The sibling search — 741 corpus documents with the same text-layer font
 signature, first pages read — found no second document of this family; the
 signature is the OCR tool's, not the producer's. This family is a method
 result more than a corpus lever.
+
+## Speed — where the time goes, and what would change it (2026-09-24)
+
+Measured on the 15,000-document baseline run (103 worker-hours, 16 logical
+CPUs; `done.tsv` has the ms per document, the slim records the outcome):
+
+| | documents | share of all reading time |
+|---|---:|---:|
+| over 10 s | 3,625 (24 %) | 90 % |
+| over 30 s | 1,484 (10 %) | 81 % |
+| over 120 s | 479 (3 %) | 65 % |
+| over 300 s | 177 (1 %) | 50 % |
+| with a page that hit the 120-s CPU budget | 230 | 38 % |
+| **right at tolerance 0** (5,390) | | **4 %** |
+| right AND over 30 s | 14 | 0.2 % |
+| right AND over 120 s | 0 | 0 |
+
+Read that table twice. The reader spends 96 % of its time on documents it
+does not get right, and **a document that needs more than 30 s is right 14
+times in 1,484**. The time is the sweep: a band nothing reads is probed at
+every set × phase × baseline of every rung, and the same page then gets the
+same treatment at the next rung. Nothing about the constant factor of the
+inner loop matters as much as this tail.
+
+What would change it, in order of gain per hour of work:
+
+1. **A 30-s page budget, and a slow lane.** `--page-budget 30` (the switch
+   exists) costs at most 14 of 5,390 right documents in this sample and
+   drops the run to roughly a fifth of its time — 103 h → ~20 h per 15,000,
+   the whole corpus from ~10 days to ~2 on this machine. The budgeted pages
+   are recorded (`budget: true`), so a second, resumable pass with a bigger
+   budget over ONLY those pages recovers the 14 later, at leisure. Measure it
+   first on the 300-sample: same command, `--page-budget 30`, `abcmp`.
+2. **Stop sweeping a page whose family is not in the roster.** 10,189 of the
+   34,416 pages read no glyph at all, and each paid the full sweep at every
+   rung. After the first K text-like bands (≥ 9 rows, ≥ 40 px of ink) fail
+   at every set, phase and baseline, the page is not ours: report the rest
+   unread without probing. Measure K on the sample first — how many pages
+   read a line AFTER three consecutive fully-failed bands (a letterhead
+   graphic over readable text is the case to protect).
+3. **Order the sets, do not enumerate them.** The fast path already tries
+   the previous band's winner first. A cheap per-band screen (line height
+   from the band's rows, the `mbank` 4-px `m` signature) would rank the
+   roster before the sweep; METHOD rule 8 — a screen ranks, it does not
+   eliminate — so the full sweep stays as the fallback, but the clean read
+   arrives after one or two sets instead of twenty-two.
+4. **Rust for the inner loop, not for the reader.** `hunt` got 92–106× over
+   the JavaScript sweep, and the reader's time is the same kind of loop
+   (`scanLine` / `tryCand`, hundreds of thousands of probes a page). A port
+   of readPage is weeks; a port of the probe alone, called from readPage
+   through N-API, is days, and the gate certifies it byte for byte. Do this
+   AFTER 1–3: it multiplies whatever is left, and 1–3 remove most of it.
+5. **More machines, not more cores.** The runner is resumable and shards
+   (`--shard k/n`); the roster is Windows fonts but the machine that reads
+   need not be (`cc76612`). A second box halves the calendar.
+
+Today's side-line probes (LAWS §13) add work only on bands that read
+something and failed the rest. Measured on 300 documents of the sample,
+committed engine vs this one, each run alone on the machine: total reading
+time ×0.99 (6,085 s → 6,027 s), per document median ×1.03 and 90th
+percentile ×1.44 — the partially read documents pay, the tail does not
+notice. Documents right 100 → 101, □ 7,889 → 7,481, 212 lines better and
+none worse. (The residue rule of `271fd78`, measured the same way against
+the Sept-21 engine: 98 → 100 right, 17 better, 7 "worse" — every one of the
+seven a whitened emblem whose leftover pieces now count as two unread bands
+instead of one, not a line lost.)
 
 ## Rules for running things here
 
