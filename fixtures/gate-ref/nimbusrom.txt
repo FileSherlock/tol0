@@ -1,7 +1,6 @@
 U.S. Department of Justice
 Federal Bureau of Prisons
 
-
 OPI:                 CPD/CSB
 NUMBER:       5521.06
 DATE:             June 4, 2015

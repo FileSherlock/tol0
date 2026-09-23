@@ -400,6 +400,17 @@ Two consequences the reader lives with:
   did again in 2026-09: a pad shrunk to the rows that vote as the rule's AA
   read the dots and broke 12 corpus lines of 10,000, two of them clean — on
   some pages the row over an underline IS a composite zone).
+- **What survives whitening inside an emblem is the emblem's.** A seal or a
+  logo is colours no pen explains — whitened — with black parts inside (an
+  eagle, a ring's lettering) that survive as components no set can read and
+  that share their rows with the letterhead's text: one agency seal was
+  2,700 of a 69-page memo's 5,598 □ (EFTA00173953, 2026-09-23). `colourInk`
+  now hands `detectObjects` its `whitened` map, and a big component whose
+  padded bbox is ≥ 15 % whitened colour is masked as graphic residue. Text on
+  paper has 0 % — a blue link is CONVERTED, not whitened, and keeps every
+  pixel; `nimbusrom` 161 □ → 155, 17 gate documents byte-identical. What it
+  does not catch: an emblem's colours that DO convert through some pen (the
+  same seal converts 21 k pixels through 28 pens) — those stay □ for now.
 - **A pad is don't-care, not blind.** The pad stays. But a byte that sits in a
   lone rule's pad *exactly as the glyph would leave it on white paper* is
   evidence for that glyph: the rule has no ink there, or the byte would not be

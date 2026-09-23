@@ -164,7 +164,8 @@
         if (same) return page;
       }
       return { w, h, gray: Float32Array.from(c.gray), colorRemoved: c.removed, colorRead: c.convertedN,
-        converted: c.convertedN ? c.converted : null, bandLo: c.bandLo, bandHi: c.bandHi };
+        converted: c.convertedN ? c.converted : null, bandLo: c.bandLo, bandHi: c.bandHi,
+        whitened: c.removed ? c.whitened : null };          // detectObjects: neutral residue inside whitened colour is a graphic's
     }
     // no RGBA (cached page): fractional gray = non-neutral (sum-only law)
     for (let i = 0; i < n; i++) {

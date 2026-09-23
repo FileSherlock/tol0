@@ -418,6 +418,39 @@ test("scanLine: a sliver of underline left against a descender is the rule's own
   assert.strictEqual(bare.fails.length, 1);
 });
 
+test("detectObjects: the neutral residue of a whitened emblem is a graphic's, not a □", () => {
+  // An agency seal is a disc of colours no pen explains — colourInk whitens
+  // them — with black parts inside (an eagle, the ring's lettering) that
+  // survive as components no set can read: one seal cost a 69-page memo
+  // 2,700 of its 5,598 □ (2026-09-23). A big component whose padded bbox is
+  // ≥ 15 % whitened colour is the emblem's own and is masked; the black word
+  // beside it, on white paper, keeps every pixel and reads clean.
+  const set = abcSet(), w = 160, h = 60;
+  const gray = new Uint8Array(w * h).fill(255), page0 = { w, h, gray };
+  drawWord(page0, set, 'ABC', [100, 106, 112], 40);
+  const rgb = new Uint8Array(w * h * 3);
+  for (let i = 0; i < w * h; i++) rgb[3 * i] = rgb[3 * i + 1] = rgb[3 * i + 2] = gray[i];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {                     // the seal: noise colours in a disc
+    const dx = x - 40, dy = y - 30; if (dx * dx + dy * dy > 20 * 20) continue;
+    const i = y * w + x; rgb[3 * i] = (x * 37) & 255; rgb[3 * i + 1] = (y * 91) & 255; rgb[3 * i + 2] = ((x + y) * 53) & 255;
+  }
+  for (let y = 26; y < 34; y++) for (let x = 36; x < 44; x++) { const i = y * w + x; rgb[3 * i] = rgb[3 * i + 1] = rgb[3 * i + 2] = 0; }   // its black eagle
+  const c = E.colourInk(w, h, rgb, 3);
+  assert.ok(c.removed > 500 && c.whitened, 'the noise is whitened');
+  const page = { w, h, gray: c.gray, converted: c.convertedN ? c.converted : null, bandLo: c.bandLo, bandHi: c.bandHi, whitened: c.whitened };
+  const det = E.detectObjects(page);
+  assert.ok(det.mask[30 * w + 40], 'the eagle is masked');
+  for (const g of set.byPhy.get(0)) for (let k = 0; k < g.inkC.length; k++) assert.strictEqual(det.mask[(40 + g.dy + g.inkR[k]) * w + 100 + g.dx + g.inkC[k]], 0, 'the word is not');
+  assert.strictEqual(E.findBands(page, det.mask).length, 1, 'one band: the text line; the eagle makes none');
+  const L = E.scanLine(page, det.mask, set, 0, 40, 0, w);
+  assert.deepStrictEqual(L.glyphs.map(g => g.ch), ['A', 'B', 'C']);
+  assert.strictEqual(L.fails.length, 0);
+  // without the whitened map (a cached gray page) the eagle is what it was: ink nobody reads
+  const det0 = E.detectObjects({ ...page, whitened: null });
+  assert.strictEqual(det0.mask[30 * w + 40], 0);
+  assert.strictEqual(E.findBands(page, det0.mask).length, 2);
+});
+
 // ---- colourInk (LAWS §9) ----
 // A coloured pen composites over white per channel, page_c = (65280 −
 // (255 − C_c)·e) >> 8 — so a blue word is the black word seen through the

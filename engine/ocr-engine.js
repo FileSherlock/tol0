@@ -658,6 +658,24 @@
         if (rX0[i] < cX0[r]) cX0[r] = rX0[i]; if (rX1[i] > cX1[r]) cX1[r] = rX1[i];
         if (rY[i] < cY0[r]) cY0[r] = rY[i]; if (rY[i] > cY1[r]) cY1[r] = rY[i];
       }
+      // GRAPHIC RESIDUE: a coloured emblem (a seal, a logo) is whitened by
+      // colourInk where no pen explains it, but its neutral parts — a black
+      // eagle, the ring's lettering — survive as components no set can read:
+      // 2,700 of a 69-page memo's 5,598 □ were one agency seal (2026-09-23).
+      // A big component whose padded bbox is ≥ 15 % whitened colour is the
+      // graphic's own and is masked (text on paper has 0 % — a blue link is
+      // CONVERTED, not whitened, so it keeps every pixel). Summed-area table
+      // over the whitened map, once per page; page.whitened is colourInk's.
+      const wh = page.whitened;
+      let sat = null;
+      if (wh) {
+        sat = new Int32Array((w + 1) * (h + 1));
+        for (let y = 1; y <= h; y++) { let row = 0; for (let x = 1; x <= w; x++) { row += wh[(y - 1) * w + x - 1]; sat[y * (w + 1) + x] = sat[(y - 1) * (w + 1) + x] + row; } }
+      }
+      const whitenedShare = (x0, x1, y0, y1) => {
+        const a = Math.max(0, x0 - 2), b = Math.min(w, x1 + 3), c = Math.max(0, y0 - 2), d = Math.min(h, y1 + 3), W1 = w + 1;
+        return (sat[d * W1 + b] - sat[c * W1 + b] - sat[d * W1 + a] + sat[c * W1 + a]) / ((b - a) * (d - c));
+      };
       // classify roots in first-run (raster) order; cls 1 = mask its pixels
       const cls = new Uint8Array(nRuns);
       for (let i = 0; i < nRuns; i++) {
@@ -665,7 +683,7 @@
         if (!cN[r] || cls[r]) continue;                   // visited via earlier run
         cls[r] = 2;                                       // classified, keep
         if (cMin[r] >= 244) cls[r] = 1;                   // ghost
-        else if (cN[r] > 12) bigs.push([cX0[r], cX1[r], cY0[r], cY1[r]]);
+        else if (cN[r] > 12) { if (sat && whitenedShare(cX0[r], cX1[r], cY0[r], cY1[r]) >= 0.15) cls[r] = 1; else bigs.push([cX0[r], cX1[r], cY0[r], cY1[r]]); }
         else if (cX1[r] - cX0[r] < 4 && cY1[r] - cY0[r] < 4)
           smalls.push({ x0: cX0[r], x1: cX1[r], y0: cY0[r], y1: cY1[r], minv: cMin[r], r });
       }
@@ -2423,6 +2441,7 @@
     const penOf = new Map();                           // converted pixel -> the pen that explained it
     const orphans = [];                                // tiny whitened components, revisited below
     let removed = 0, convertedN = 0;
+    const whitened = new Uint8Array(w * h);      // colour no pen explained (a graphic's) — detectObjects reads it
     const stack = [];
     for (let s0 = 0; s0 < N; s0++) {
       if (spread[s0] < 4 || comp[s0] >= 0) continue;
@@ -2462,7 +2481,7 @@
           penOf.set(i, pens.indexOf(bestP));
         }
       } else {
-        for (const i of members) { gray[i] = 255; removed++; }
+        for (const i of members) { gray[i] = 255; removed++; whitened[i] = 1; }
         // …unless it is a DOT. The dark-core rule above needs four dark
         // pixels, and the dot of an 'i', a period or a colon has one or two:
         // on a blue link they were whitened while the word around them was
@@ -2540,7 +2559,7 @@
         else { bandLo[i] = gray[i]; bandHi[i] = gray[i]; }
       }
     }
-    return { gray, converted, convertedN, removed, bandLo, bandHi,
+    return { gray, converted, convertedN, removed, bandLo, bandHi, whitened,
       pens: pens.map(p => [p.C[0], p.C[1], p.C[2], p.c]) };
   }
 

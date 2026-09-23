@@ -6,7 +6,7 @@ document and byte-compares its whole transcript (`<name>.txt`) and its counts
 tune and no threshold to argue about: any change in any number is the signal.
 
 Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
-2026-09-21 — see below):
+2026-09-21, `nimbusrom` 2026-09-23 — see below):
 
 | | lines | glyphs | □ |
 |---|---:|---:|---:|
@@ -16,9 +16,9 @@ Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
 | report | 34 | 2,034 | 2 |
 | courier_1 | 1,552 | 114,817 | 0 |
 | courier_2 | 4,899 | 374,462 | 0 |
-| nimbusrom | 223 | 13,034 | 161 (135 coloured) |
+| nimbusrom | 223 | 13,034 | 155 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| **total** | **33,736** | **2,436,390** | **167 (139 coloured)** |
+| **total** | **33,736** | **2,436,390** | **161 (139 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
 not the reader's. The 11 `nimbus791` documents also carry truth transcripts, and every one
@@ -29,7 +29,7 @@ letter-exact and space-exact, 0 rows differing.
 
 Since 2026-09-03 coloured ink is read as coverage ([LAWS §9](../../docs/LAWS.md#9-coloured-ink-is-coverage))
 instead of being whitened, and the summary counts the clusters that lie in
-coloured ink apart: **139 of the 167 □ are coloured** — the blue Helvetica-bold
+coloured ink apart: **139 of the 161 □ are coloured** — the blue Helvetica-bold
 section headings of `nimbusrom` (a face its pool does not carry) and the
 underlined blue links of `email` (a palette-quantized ramp, exact only at the
 ladder's tolerant rungs). They were always on the page; before, the reader
@@ -236,3 +236,9 @@ converted ink is adopted as that ink. `email` moved, alone:
   underline's ±2-row padding, which rules keep blanket on purpose.
 
 The other 17 documents are byte-identical, summaries included.
+
+**`nimbusrom` 161 □ → 155 (2026-09-23):** the neutral pieces of the DOJ seal
+that survive whitening — a big component whose padded bbox is ≥ 15 % whitened
+colour — are a graphic's residue and are masked (`detectObjects`); one seal
+band fewer in the transcript, no text line changed.
+
