@@ -168,9 +168,9 @@ A 69-page FBI OCDETF memo the app roster read nothing of. Two days, one family:
 chain's mupdf drew its builtin URW Nimbus Roman — `nimbusromlin942` in
 `lab/families.mjs` (11 pt body = em64 942; 10 pt = 849; small caps 768; the red
 8 pt warning = 685), linear law, a palette per page. Registry pool
-`nimbusrom942`; gate entry `fbimemo` holds the read still: **1,075 lines,
-47,583 glyphs, 3,014 □** (5,598 before the residue rule; 3,807 before LAWS
-§13). Not a clean document — a family, seven free sets, two reader rules,
+`nimbusrom942`; gate entry `fbimemo` holds the read still: **1,071 lines,
+47,537 glyphs, 3,030 □** (5,598 before the residue rule; 3,807 before LAWS
+§13; 3,014 before the ±2-row guard). Not a clean document — a family, seven free sets, two reader rules,
 and a method:
 
 - **Every lab prefilter was blind.** `mbank scan`, `identify`, `sweep` compare
@@ -199,12 +199,22 @@ What is still □ in it — black text first, as asked:
 
 0. **Black text, 435 □:** bullets (56: Word's `■`, a Symbol/Dingbats glyph
    no set has — mupdf's URW Dingbats is inside its wasm, not in `fonts/`);
-   single-glyph cells (the count column `1`, `S`/`P`/`F` on p26 — one fail
-   is not a run, so the side probe skips it; relax to isolated single fails
-   beside the line and measure the probe cost); p26's right-hand column
-   (111 □, a table whose cells the side probe does not yet reach — look);
-   the bold header/footer line on p55+ reads garbled (`SSl'VEBUUNS`: a
-   different phase or a scan?); the p1 agency strip (no text layer: logos).
+   one-glyph cells — tried and REVERTED the same day (a run ≥ 5 px beside
+   the line's glyphs: p24 49 → 17, p26 142 → 124, p20 53 → 42 on the memo,
+   but two documents of the 300-sample worse, twice: the extra probes pushed
+   a page with 15 unread bands past the ladder's 120-s CPU budget and the
+   union rung that used to read it never ran — the budget item under Speed
+   is what this needs first); p26's
+   rows of three multi-line cells at three baselines (a cell's UPPER line
+   stays □ when its lower line reads as the side line — the run's dead
+   pixels end at the lower line's bottom row, and nothing revisits the rows
+   above; a second pass over what the side line left would take it);
+   the bold header/footer line on p55/p56 reads garbled (`SSl'VEBUUNS`) —
+   measured: the same glyph byte lands on DIFFERENT palette entries in
+   adjacent rows there (p58 has 81/81 where p55 has 78/84 in the E's stem),
+   so those pages' quantization is not nearest-gray with a fixed tie — a
+   dithered palette, LAWS §4's first counter-example; the p1 agency strip
+   (no text layer: logos).
    The coloured and residue classes below are not black text and wait.
 
 1. **Coloured text through the linear law** — the red warning blocks (415 □).
@@ -253,20 +263,47 @@ inner loop matters as much as this tail.
 
 What would change it, in order of gain per hour of work:
 
-1. **A 30-s page budget, and a slow lane.** `--page-budget 30` (the switch
-   exists) costs at most 14 of 5,390 right documents in this sample and
-   drops the run to roughly a fifth of its time — 103 h → ~20 h per 15,000,
-   the whole corpus from ~10 days to ~2 on this machine. The budgeted pages
-   are recorded (`budget: true`), so a second, resumable pass with a bigger
-   budget over ONLY those pages recovers the 14 later, at leisure. Measure it
-   first on the 300-sample: same command, `--page-budget 30`, `abcmp`.
-2. **Stop sweeping a page whose family is not in the roster.** 10,189 of the
-   34,416 pages read no glyph at all, and each paid the full sweep at every
-   rung. After the first K text-like bands (≥ 9 rows, ≥ 40 px of ink) fail
-   at every set, phase and baseline, the page is not ours: report the rest
-   unread without probing. Measure K on the sample first — how many pages
-   read a line AFTER three consecutive fully-failed bands (a letterhead
-   graphic over readable text is the case to protect).
+1. **A 30-s page budget — measured, and NOT the lever.** `--page-budget 30`
+   on the 300-sample, same engine, each run alone: documents right 101 →
+   101, but □ 7,481 → 8,034 (40 lines worse — pages cut off mid-read that
+   the 120-s budget finished: EFTA00961975 10 □ → 565) for a time of ×0.96.
+   The table above is per DOCUMENT; the slow documents are many-page
+   documents whose pages each cost 10–20 s of sweeps, not single pages
+   over the budget. So the tail is pages that read nothing, at every rung —
+   item 2 — and the next run records the ms per page (`p[].ms`) so that
+   claim gets measured instead of inferred — it is, in item 2.
+2. **Stop sweeping a page whose family is not in the roster — carefully.**
+   Per PAGE, from the 300-sample's `pms` (574 pages read, 6,016 s CPU):
+
+   | page class | pages | share of CPU | median | 90th |
+   |---|---:|---:|---:|---:|
+   | partial (some lines read, some not) | 262 | 50 % | 8.5 s | 21 s |
+   | nobody reads it (no glyph on the page) | 131 | 38 % | 14.1 s | 29 s |
+   | clean | 175 | 8 % | 1.2 s | 6.5 s |
+   | over the 120-s budget | 2 | 4 % | | |
+
+   A page nobody reads costs a median 14 s: the ladder's NOBODY rule already
+   stops after the unpooled rungs, but each of those is a full sweep of
+   every band. The obvious cut — abort a rung after its first K bands fail
+   every set, phase and baseline — is NOT safe: of the 439 pages that read
+   something, 8.0 % start with three unread bands and 5.5 % with five (a
+   header in a foreign face over a body in a known one). What is safe is
+   ORDER: probe the page's longest text band first (the body, not the
+   letterhead), and when THAT fails every set at every baseline, the rest
+   of the page's bands are probed with the hint sets only. Measure it the
+   same way before believing it. The partial class is the other half: its
+   unread bands are the same sweep, band by band.
+   **The budget couples speed to quality**: the 120 s are for the whole
+   ladder of a page, so a slow first rung starves the union rung that would
+   have read the page whole (EFTA01009681 p1: 15 unread bands; any extra
+   probe cost in rung 1 and the page comes back "From:" + 3 □ instead of
+   clean). Give each rung its own share of the budget, or run the union
+   rung first on a page whose previous page it won — cheap, and it makes
+   every later reader improvement safe to add. (The ±2-row guard on side
+   lines is the same trade seen from the reader: it stops a wrong-set rung
+   from fragmenting a line, and it costs EFTA00942260 p1 y157 the
+   attachment name a y-phase-sibling set read one row below the line,
+   1 □ → 20. A ladder that could not be fooled would not need the guard.)
 3. **Order the sets, do not enumerate them.** The fast path already tries
    the previous band's winner first. A cheap per-band screen (line height
    from the band's rows, the `mbank` 4-px `m` signature) would rank the

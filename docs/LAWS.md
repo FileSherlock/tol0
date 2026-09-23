@@ -573,12 +573,22 @@ its own. EFTA00173953 (2026-09-24): ~900 of the memo's 1,105 black-text □
 were the date and count columns of pages 20–26.
 
 **Side lines.** After a band's line is scanned, each *wide* run of its fails
-— two or more, or ≥ 14 px; one glyph is not a cell — is re-probed on its own
-x-window over the baselines its ink rows allow (bottom ink row + 1, up to
-`maxDesc` higher), every set and phase, and read as a line of its own when a
-probe reads and the scan over the run leaves fewer □ than the run had. The
-run's fails leave the line that failed them, so nothing is counted twice; a
-run nothing reads keeps its □ and costs a few probes; a run touching a
+— two or more, or ≥ 14 px — is re-probed on its own x-window over the
+baselines its ink rows allow (bottom ink row + 1, up to `maxDesc` higher),
+every set and phase, and read as a line of its own when a probe reads and
+the scan over the run leaves fewer □ than the run had. Two guards, from a
+300-document corpus A/B: a run among the line's own glyphs is that line's
+(a missing dot, an underline sliver, the regular words of a line a bold-only
+rung read the label of), and a baseline within two rows of the line's own
+is not a cell's but another set's y-phase convention — without them the
+app's ladder had a wrong-set rung re-read "To: Epstein Jeffrey <…>" as
+three fragments and outscore the union rung that read it whole. One glyph
+is not a cell, measured: letting a lone glyph-sized fail qualify read the
+memo's count columns (p24 49 □ → 17) and cost the same A/B two documents,
+twice — the probes pushed an expensive page past the ladder's 120-s CPU
+budget and the union rung that used to read it whole never ran. The run's
+fails leave the line that failed them, so nothing is counted twice; a run
+nothing reads keeps its □ and costs a few probes; a run touching a
 redaction halo is the box's own and is left alone. A cell that straddles a
 stacked split fails in both segments and is read from the lower one, where
 its bottom ink row is. p24: 335 □ → 49.

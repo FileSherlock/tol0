@@ -623,14 +623,14 @@ test('readPage: cells of a table row on their own baselines read as side lines',
   // cell its probe anchor fell in; the other fails at THAT baseline, and
   // its run of fails is re-probed on its own x-window over the baselines
   // its ink rows allow — and read as a line of its own
-  const T = makeGlyph('T', ['####', '.##.', '.##.', '.##.', '.##.', '.##.', '.##.'], { dy: -7, adv: 6 });
+  const T = makeGlyph('T', ['####', '.##.', '.##.', '.##.', '.##.', '.##.', '.##.', '.##.'], { dy: -8, adv: 6 });
   const set = makeSet('synth', [...abcSet().byPhy.get(0), T]), page = makePage(400, 40);
-  drawWord(page, set, 'TAT', [10, 16, 22], 20);        // rows 13–19: the window is rows 13–19
-  drawWord(page, set, 'CBA', [300, 306, 312], 18);     // rows 13–17, inside it, two rows up
+  drawWord(page, set, 'TAT', [10, 16, 22], 20);        // rows 12–19: the window is rows 12–19
+  drawWord(page, set, 'CBA', [300, 306, 312], 17);     // rows 12–16, inside it, three rows up (±2 is another set's y-phase, not a cell)
   const { lines } = await E.readPage(page, [set], {});
   const read = lines.filter(l => l.set).sort((a, b) => a.baseline - b.baseline);
   assert.deepStrictEqual(read.map(l => [l.baseline, l.glyphs.map(g => g.ch).join(''), l.fails.length, !!l.side]),
-    [[18, 'CBA', 0, true], [20, 'TAT', 0, false]]);
+    [[17, 'CBA', 0, true], [20, 'TAT', 0, false]]);
   assert.ok(read.every(l => l.clean), "both clean: the run's fails left the line they failed on");
   assert.strictEqual(lines.filter(l => !l.set).length, 0, 'no unread band');
 });

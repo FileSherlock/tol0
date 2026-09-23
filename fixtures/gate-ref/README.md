@@ -20,7 +20,7 @@ end of this file):
 | courier_2 | 4,899 | 374,462 | 0 |
 | nimbusrom | 223 | 13,034 | 155 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| fbimemo | 1,075 | 47,583 | 3,014 (415 coloured) |
+| fbimemo | 1,071 | 47,537 | 3,030 (415 coloured) |
 | **total (the 18 certified)** | **33,736** | **2,436,390** | **161 (139 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
@@ -248,10 +248,11 @@ mupdf, its built-in URW Nimbus Roman standing in for an unembedded Times New
 Roman, the linear law, a palette per page — `lab/families.mjs`
 `nimbusromlin942`, found from pixels alone in one day (the method is in
 `lab/palettesweep.mjs` and docs/METHOD.md). Read with the registry's
-`nimbusrom942` pool. **1,075 lines, 47,583 glyphs, 3,014 □** (recorded
+`nimbusrom942` pool. **1,071 lines, 47,537 glyphs, 3,030 □** (recorded
 2026-09-23 at 978 / 46,721 / 3,807; re-recorded 2026-09-24 with LAWS §13 —
 side lines for table cells on their own baselines and the table's borders
-kept as rules where they cross a redacted column: black-text □ 1,105 → 435)
+kept as rules where they cross a redacted column, 3,014; then 3,030 with the
+±2-row guard the corpus A/B asked for: black-text □ 1,105 → ~450)
 — it is far from clean, and the entry exists so that number cannot drift
 unnoticed: 415 of the
 □ are the 8 pt red warning blocks (Nimbus at em64 685; they read at ±2 and not

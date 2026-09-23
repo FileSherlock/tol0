@@ -27,9 +27,7 @@ EPSTEIN; ;
 
 Date of Request:                                                               April 28, 2015
 C1-11-0049 GDEP: YNL3B (DEA)
-Case File Number / Agency:
 OCDETF Case Num  er:
-NY-NYS-0829
 OCDETF Operation Name:                                           Chain Reaction
 Requestor / Agency / Telephone Number:
 OFC Unit Chief / Telephone Number:
@@ -629,12 +627,10 @@ l(|
 
 
 ICE ROI, PA07QK13PA0002-003
-Full Name:
 E  STEIN
 Alias:                                                   Jeffrey E. EPSTEIN               FinCEN BSA ID 31000062289100
 DOB:                                                          01/20/1953                      FinCEN BSA ID 31000062289100
 FinCEN BSA ID 31000062289100
-SSN:
 
 /
 FinCEN BSA ID 31000062289100

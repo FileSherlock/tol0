@@ -2359,13 +2359,19 @@
       // (EFTA00173953 p20–26: ~900 □ in one memo). The band's pick reads
       // whichever cell the probe anchor fell in and the rest of the row fails
       // at THAT baseline, though every set in the pool reads it at its own.
-      // Each WIDE run of fails (two or more, or ≥ 14 px — one glyph is not a
-      // cell) is re-probed on its own x-window over the baselines its ink
-      // rows allow (bottom ink row + 1, up to maxDesc higher), every set and
-      // phase, and read as a line of its own when a probe reads and the scan
-      // over the run is clean. The retro-check below then retracts the fails
-      // that scan explained; a run nothing reads keeps its □ and costs a few
+      // Each WIDE run of fails (two or more, or ≥ 14 px) is re-probed on its
+      // own x-window over the baselines its ink rows allow (bottom ink row +
+      // 1, up to maxDesc higher), every set and phase, and read as a line of
+      // its own when a probe reads and the scan over the run leaves fewer □
+      // than the run had. A run nothing reads keeps its □ and costs a few
       // probes. Runs touching a redaction halo are the box's own (fragments).
+      // ONE glyph is not a cell — measured, not assumed: letting a lone
+      // glyph-sized fail qualify read the memo's count columns (p24 49 □ →
+      // 17) and cost the 300-document A/B two documents twice over (with
+      // and without the ±2-row guard below): a bold-only rung of the app's
+      // ladder, its side lines gone again, still won pages it used to lose,
+      // "From: Cashkim Bussue <" coming back as "From:" + 3 □. The ladder's
+      // rung choice, not the reader, is what that needs (NEXT-bulk.md).
       if (L.fails.length && L.failPix) {
         const runs = [];
         for (const c of L.fails) {
@@ -2383,18 +2389,21 @@
           // a cell stands beside the line's own glyphs, never among them: a
           // run inside the read text (a missing dot, an underline sliver, the
           // regular words of a line a BOLD-only rung read the label of) is
-          // that line's, and re-reading it at the SAME baseline with another
-          // set or phase would split the line into fragments — on the app's
-          // ladder a wrong-set rung then looked better than the union rung
-          // that read the whole line, and "To: Epstein Jeffrey <…>" came
-          // back as three lines missing "effrey" (EFTA00961975, 300-doc A/B)
+          // that line's, and re-reading it at the same baseline — or one
+          // row off, which is what another set's y-phase convention is —
+          // with another set would split the line into fragments: on the
+          // app's ladder a wrong-set rung then looked better than the union
+          // rung that read the whole line, and "To: Epstein Jeffrey <…>"
+          // came back as three lines missing "effrey" (EFTA00961975,
+          // 300-document A/B, twice: at the same baseline, then at yb − 1).
+          // A cell on its own baseline is rows away (p24: 8, p26: 9).
           if (L.glyphs.some(g => g.pen + g.adv > r.x0 - 4 && g.pen < r.x1 + 4)) continue;
           let side = null;
           const pxFrom = Math.max(0, r.x0 - 2), pxTo = Math.min(page.w, r.x1 + 20);
           for (const set of sets)
             for (const phy of set.byPhy.keys())
               for (let yb = r.y1 + 1; yb >= r.y1 + 1 - set.maxDesc && yb > top; yb--) {
-                if (yb === pick.yb) continue;              // the line's own baseline is not a cell's
+                if (Math.abs(yb - pick.yb) <= 2) continue;  // the line's own baseline is not a cell's — nor is it ±2: sets and y-phases differ by a row
                 const score = probeBaseline(page, mask, set, phy, yb, pxFrom, pxTo, tol, quant, top, explained, clampBot, scanOpts);
                 if (score > 0 && (!side || score > side.score)) side = { set, phy, yb, score };
               }

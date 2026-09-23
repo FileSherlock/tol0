@@ -68,13 +68,15 @@ async function read(item, config, sets, bytes, doc) {
   let lastPass = null;
   const carry = { last: null, picks: new Map() };     // cross-page layout hints, per document
   const tot = { lines: 0, clean: 0, unread: 0, glyphs: 0, fails: 0, frags: 0, colour: 0 };
-  const p = [];
+  const p = [], pms = [];                              // pms: CPU ms per page of `p`, in order (the speed work reads it; null = not read)
   for (let pno = 1; pno <= pages; pno++) {
-    if (item.skip?.[pno]) { p.push({ pno, skipped: item.skip[pno] }); continue; }
+    if (item.skip?.[pno]) { p.push({ pno, skipped: item.skip[pno] }); pms.push(null); continue; }
     const rec = pageRecord(doc, pno);
-    if (!rec) { p.push({ pno, vector: true }); continue; }
+    if (!rec) { p.push({ pno, vector: true }); pms.push(null); continue; }
     const page = pageFromRecord(rec.mode, rec.w, rec.h, rec.body, () => {});
     if (!page) continue;
+    const tPage = process.cpuUsage();
+    const pageMs = () => { const u = process.cpuUsage(tPage); return Math.round((u.user + u.system) / 1000); };
     let lines, objects, pass = null, overBudget = false;
     if (config.ladder) {
       const lut = palLuts?.get(pno), passes = rungs(config.ladder, lut);
@@ -102,7 +104,7 @@ async function read(item, config, sets, bytes, doc) {
         overBudget = e === BUDGET;
         // the best rung that FINISHED (most ink explained, earliest on a tie), if any did
         const best = [...ran.values()].sort((x, y) => (y.glyphs - y.fails) - (x.glyphs - x.fails))[0];
-        if (!best) { p.push({ pno, budget: true, lines: [] }); continue; }
+        if (!best) { p.push({ pno, budget: true, lines: [] }); pms.push(pageMs()); continue; }
         got = { res: best.r, pass: best.p };
       }
       ({ lines, objects } = got.res); pass = passKey(got.pass);
@@ -113,11 +115,12 @@ async function read(item, config, sets, bytes, doc) {
     const r = pageResult(pno, lines, objects);
     if (pass) r.json.pass = pass;
     if (overBudget) r.json.budget = true;
+    pms.push(pageMs());
     for (const k of ['lines', 'glyphs', 'fails', 'frags', 'colour']) tot[k] += r.tot[k];
     for (const L of r.json.lines) { if (L.unread) tot.unread++; else if (L.baseline !== undefined && !L.fails) tot.clean++; }
     p.push(slimPage(r.json));
   }
-  return { name: item.name, sha: createHash('sha256').update(bytes).digest('hex').slice(0, 16), pages, tot, p };
+  return { name: item.name, sha: createHash('sha256').update(bytes).digest('hex').slice(0, 16), pages, tot, p, pms };
 }
 
 /** the index row: pages, lines, clean lines, unread bands, glyphs, unexplained clusters */
