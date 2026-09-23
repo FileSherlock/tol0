@@ -27,7 +27,9 @@ EPSTEIN; ;
 
 Date of Request:                                                               April 28, 2015
 C1-11-0049 GDEP: YNL3B (DEA)
+Case File Number / Agency:
 OCDETF Case Num  er:
+NY-NYS-0829
 OCDETF Operation Name:                                           Chain Reaction
 Requestor / Agency / Telephone Number:
 OFC Unit Chief / Telephone Number:
@@ -390,6 +392,7 @@ Cases and Contacts: The targets are subjects in the following case:
 
 
 C1-11-0049           12/17/2010
+Pending
 New    ork, N                                                                           Judicial
 SENSITIVE BUT UNCLAS
 Page 3 of 63
@@ -626,25 +629,27 @@ l(|
 
 
 ICE ROI, PA07QK13PA0002-003
+Full Name:
 E  STEIN
 Alias:                                                   Jeffrey E. EPSTEIN               FinCEN BSA ID 31000062289100
 DOB:                                                          01/20/1953                      FinCEN BSA ID 31000062289100
 FinCEN BSA ID 31000062289100
+SSN:
 
 /
 FinCEN BSA ID 31000062289100
 U.  .    ir   n     ands
-
 ICE Subject Record P8529715900CWP
+State:
 Investment Advisor               FinCEN BSA ID 31000062289100
-
 Accountant                      FinCEN BSA ID 20112031315534
+Occupation:
 SLK DESIGNS LLC              FinCEN BSA ID 310000531  9085
-
 HYPERION AIR, INC.            FinCEN BSA ID 31000031627861
+Business/Employer:
 ICE P6B38569000CPA        ICE Subject Record P6B38569000CPA
-
 ICE P8529715900CWP        ICE Subject Record P8529715900CWP
+Agency Identifier(s):
 
 DESIGNS LLC and , INC.
 
@@ -652,16 +657,21 @@ DESIGNS LLC and , INC.
 
 FinCEN BSA ID
 31000062289100
+03/06/2015
 FinCEN BSA ID
 31000062289100
+03/06/2015
 FinCEN BSA ID
 31000062289100
+03/06/2015
 
 FinCEN BSA ID
 31000062289100
+03/06/2015
 
 FinCEN BSA ID
 31000062289100
+03/06/2015
 SENSITIVE BUT UNCLAS
 Page 14 of 63
 
@@ -678,10 +688,14 @@ M Jeffrey E. EPSTEIN        03/06/2015
 R Jeffrey E. EPSTEIN       03/06/2015
 
 
+
+
+
 numbers were not listed.
 
 
 Jeffrey E. EPSTEIN
+ID
 31
 
 
@@ -696,6 +710,8 @@ LLC
 EN BS
 
 Number:
+Active
+Signor
 t Thomas, Virgi                                                                                            Accountant                       urin
 Islands, U.S.
 00802
@@ -714,6 +730,10 @@ SLK DESIGNS
 LLC
 .                                                                                                                       FinCEN BS
 New York, NY                                                                                                                      3100005317
+Not Listed
+Active
+Association
+Not Listed
 10065
 etails: EPSTEIN and SLK DESIGNS LLC are listed as subjects together in a 2014 USAR. FinCE
 ndicates EPSTEIN sent SLK DESIGNS LLC $20,000 from an external bank account in 2014.
@@ -721,6 +741,7 @@ ndicates EPSTEIN sent SLK DESIGNS LLC $20,000 from an external bank account in 2
 
 
 1-11-004         12/17/2010
+Pending
 New    ork, N                                                                     Judicial
 etails:
 EPSTEIN,
@@ -733,6 +754,7 @@ OPERATION
 ANGEL
 ICE/                PA07QK13P                                     Closed/           WATCH/RCSO
 Paris, France              A0002                                       10/03/2013           PRESENSE/
+06/0  /2013
 TRANSITING
 INFO SHARING
 etails: ICE reporting indicates Jeffrey EPSTEIN was convicted in 2008 of procuring a person under a
@@ -740,6 +762,7 @@ etails: ICE reporting indicates Jeffrey EPSTEIN was convicted in 2008 of procuri
 
 ICE/                LV15HT09L                                    Pending/
 Las Vegas, NV             V0009                                       01/27/2010
+02/02/2009
 
 etails: ICE reporting indicates Jeffrey EPSTEIN pled guilty on 06/30/2008 on charges relating to
 olicitation of prostitution and procurement of minors to engage in prostitution  (ICE ROI,
@@ -758,6 +781,8 @@ Date of Report: May 18, 2015
 
 
 West Palm Beach,                                 07/28/2006
+Jeffre
+STEI
 
 etails: ICE reporting indicates Jeffery EPSTEIN pled guilty on 06/30/2008 to state offences relating t
 olicitation of prostitution and procurement of minors to engage in prostitution (ICE Subject Record
@@ -783,12 +808,24 @@ Discovering target associations based on vehicle stops.
 
 CBP CYRIL E KING AP INTL
 ARRIVALS
+30
+05/22/2013
+05/02/2015
 US CUST SERV ENFORCEMENT
 SYSTEMS NEWINGTON
+145
+05/11/2013
+05/02/2015
 FL DEPT OF LAW ENFORCEMENT
 COMMAND CENTER
+05/29/2013
+05/01/2015
+
 NY STATE DIV CRIMINAL JUSTICE
 SVCS ALBANY
+12
+06/12/2013
+04/28/2015
 DRUG ENFOR ADMIN NEW YORK              5            04/24/2015       04/24/2015
 
 SENSITIVE BUT UNCLAS
@@ -801,50 +838,93 @@ SODOFC-15-12392
 Date of Report: May 18, 2015
 DHS ICE INVEST RAC ST THOMAS
 USVI
+04/13/2015
+04/13/2015
 CUSTOMS AND BORDER
 PROTECTION
+13
+05/12/2013
+04/03/2015
 US CUSTOMS SERVICE ENF
 SECURITY NEWINGTON
+14
+06/02/2013
+03/01/2015
 DHS ICE INVEST SAC MIAMI                   2            02/26/2015       02/26/2015
 FBI NOPU                                     1            12/01/2014       12/01/2014
 CUSTOMS AND BORDER
 PROTECTION BEDFORD L G
+10/13/2014
+11/30/2014
 CBP LOGAN INTERNATIONAL
 AIRPORT
+10/13/2014
+11/30/2014
 US CUSTOMS SERV AIRPORT
 BAGGAGE I&C NEWARK
+20
+03/12/2014
+10/23/2014
 CUSTOMS AND BORDER
 PROTECTION
+05/16/2014
+10/23/2014
 CUSTOMS AND BORDER
 PROTECTION
+15
+03/11/2014
+10/07/2014
 US SECRET SERV UNIFORM DIV
 WASHINGTON
+08/12/2014
+08/12/2014
 U S SECRET SERVICE WHITE HOUSE
 DIVISION
+08/12/2014
+08/12/2014
 CUSTOMS AND BORDER
 PROTECTION
+10/15/2013
+05/06/2014
 US CUSTOMS SERV INSPECTION
 CONTROL CLAYTON
+04/19/2014
+04/20/2014
 USC MARCH AFB OFFICE OF
 ENFORCEMENT RIVERSIDE
+06/06/2013
+03/27/2014
 CBP SEATTLE INTL AIRPORT                   5            03/19/2014       03/20/2014
 USC SEA-TAC AIRPORT PASS PROC
 I&C SEATTLE
+03/19/2014
+03/19/2014
 CBSA ASFC HQ IBQ                            1            03/17/2014       03/17/2014
 DOJ U S ATTORNEY GENERAL'S
 OFFICE ST THOMAS
+01/08/2014
+01/08/2014
 CUSTOMS AND BORDER
 PROTECTION
+11/27/2013
+11/27/2013
 USC OFF INVESTIGATIONS
 LEVITTOWN
+09/10/2013
+11/15/2013
 HARVARD UNIVERSITY CAMPUS
 POLICE
+11/06/2013
+11/06/2013
 CBP JFK INTERNATIONAL AIRPORT            3            06/03/2013       10/01/2013
 CUSTOMS AND BORDER
 PROTECTION
+09/14/2013
+09/14/2013
 VIRGIN ISLANDS POLICE
 DEPARTMENT
-
+06/28/2013
+06/28/2013
 SENSITIVE BUT UNCLAS
 Page 18 of 63
 
@@ -887,9 +967,17 @@ FBI CJIS DIVISION                              3            05/14/2013       05/
 
 eutsche Bank Tru
 ompany Americas
+3100004059
+01/31/2014
+$0
 3100003832                12/19/2013           $0         $21,150 .
 ew York, NY 101
+frey EPS
 OC:
+3100003662
+11/15/2013
+$0
+$20,  23
 Details: FinCEN indicates conducted transactions on behalf of EPSTEIN which affected
 account 35266976.
 
@@ -913,6 +1001,7 @@ St. Thomas, Virgin
 Islands, U.S. 00802         Paris, 75009 France
 
 Jeffrey EPSTEIN/
+Bank
 FinCEN BSA ID
 St. Thomas, Virgin 31000040594074
 Islands, U.S. 00802
@@ -921,7 +1010,7 @@ Jeffrey EPSTEIN/
 FinCEN BSA ID
 St. Thomas, Virgin 31000001301346
 Islands, U.S. 00802
-
+Paris,     008 France
 Highbridge Capital
 Jeffrey EPSTEIN/                Corporation/
 FinCEN BSA ID
@@ -929,30 +1018,32 @@ St. Thomas, Virgin             Grand Cayman, 20101910292960
 Islands, U.S. 00802            Cayman Islands
 BWI
 
-
 Jeffrey EPSTEIN/
+HS   C Pri
 31000001301346
-
 St. Thomas, Virgin
+FinCEN BSA ID
 Geneva       H12
 
 Jeffrey EPSTEIN/
 FinCEN BSA ID
 St. Thomas, Virgin 20101910292960
 Islands, U.S. 00802
-
+Paris,            France
 JP Morgan Chase
 Jeffrey E. EPSTEIN/              Bank, N.A./
 
-New York, NY 10065           New York, NY
+New York, NY 10065          New York, NY
+20111191187434
 10065
-
 
 Jeffrey EPSTEIN/ .
 20103162812934
 St. Thomas, Virgin
 Islands, U.S. 00802
+N
 31        31
+1006
 
 SENSITIVE BUT UNCLAS
 Page 20 of 63

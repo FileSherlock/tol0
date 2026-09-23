@@ -558,3 +558,45 @@ this way is **byte-identical** to the one `tools/fontgen.mjs` generated —
 `test/ftraster.test.js` compares every record of `dejavuserif786` (TrueType)
 and `nimbus791` (CFF in an .otf) — so a writer is no longer limited to the
 families, styles and sizes somebody generated in advance.
+
+## 13. A band is rows; a baseline is a cell's
+
+The reader cuts a page into **bands** — maximal runs of rows that carry ink
+outside the object mask — and reads each band at one baseline with one set,
+peeling stacked lines off bottom-first when a band holds more than one
+(`readPage`). That model has a hole a table falls through: a row of cells is
+one band, and its cells sit on their own baselines — a two-line agency name
+beside a vertically centred date, a count column a few rows up. The band's
+pick reads whichever cell the probe anchor fell in, and everything else in
+the row fails at *that* baseline, though every set in the pool reads it at
+its own. EFTA00173953 (2026-09-24): ~900 of the memo's 1,105 black-text □
+were the date and count columns of pages 20–26.
+
+**Side lines.** After a band's line is scanned, each *wide* run of its fails
+— two or more, or ≥ 14 px; one glyph is not a cell — is re-probed on its own
+x-window over the baselines its ink rows allow (bottom ink row + 1, up to
+`maxDesc` higher), every set and phase, and read as a line of its own when a
+probe reads and the scan over the run leaves fewer □ than the run had. The
+run's fails leave the line that failed them, so nothing is counted twice; a
+run nothing reads keeps its □ and costs a few probes; a run touching a
+redaction halo is the box's own and is left alone. A cell that straddles a
+stacked split fails in both segments and is read from the lower one, where
+its bottom ink row is. p24: 335 □ → 49.
+
+**Crossing rules.** The other half of the same page: the table's horizontal
+borders (650 px, dark) cross a redacted column (116 px, 800 rows). Each border
+row joins the box object by overlap, the box-extent segmentation (§8) keeps
+the box's own extent — rightly, the box is whole — and the border vanishes:
+no rule, no mask, and every cell row ends in □s at its stub. `detectObjects`
+now keeps such a row as a rule of its own, judged on RAW extents before the
+bar clip: a thin run of rows (< 5) more than twice as wide as the box
+segments above and below it, which must agree with each other. Two stacked
+redactions' fused rows (`big` p339) have different boxes above and below and
+are not this. (Refusing the row merge upstream instead — a row within 2× of
+its object — cut those fused rows away from the upper box, whose body rows
+vouched for their columns, and a 13-px sliver went unmasked: `big` 0 □ → 1.
+Rule 2 of METHOD.md, in one afternoon.)
+
+Both are held by synthetic tests (`test/engine.test.js`: "cells of a table
+row", "a rule crossing a redaction box") and by the `fbimemo` gate entry.
+

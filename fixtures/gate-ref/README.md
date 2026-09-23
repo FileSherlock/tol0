@@ -20,7 +20,7 @@ end of this file):
 | courier_2 | 4,899 | 374,462 | 0 |
 | nimbusrom | 223 | 13,034 | 155 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| fbimemo | 978 | 46,721 | 3,807 (415 coloured) |
+| fbimemo | 1,075 | 47,583 | 3,014 (415 coloured) |
 | **total (the 18 certified)** | **33,736** | **2,436,390** | **161 (139 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
@@ -248,8 +248,12 @@ mupdf, its built-in URW Nimbus Roman standing in for an unembedded Times New
 Roman, the linear law, a palette per page — `lab/families.mjs`
 `nimbusromlin942`, found from pixels alone in one day (the method is in
 `lab/palettesweep.mjs` and docs/METHOD.md). Read with the registry's
-`nimbusrom942` pool. **978 lines, 46,721 glyphs, 3,807 □** — it is far from
-clean, and the entry exists so that number cannot drift unnoticed: 415 of the
+`nimbusrom942` pool. **1,075 lines, 47,583 glyphs, 3,014 □** (recorded
+2026-09-23 at 978 / 46,721 / 3,807; re-recorded 2026-09-24 with LAWS §13 —
+side lines for table cells on their own baselines and the table's borders
+kept as rules where they cross a redacted column: black-text □ 1,105 → 435)
+— it is far from clean, and the entry exists so that number cannot drift
+unnoticed: 415 of the
 □ are the 8 pt red warning blocks (Nimbus at em64 685; they read at ±2 and not
 at 0, because the colour inversion in `colourInk` does not yet apply this
 family's +1 — open), ~900 are the agency seal's converted colour (the whitened

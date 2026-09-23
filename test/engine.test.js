@@ -615,6 +615,42 @@ test('boxBetween: a bar between two pens splits, whatever the advances do; a bar
   assert.ok(B([[482, 678]], J, lt));
 });
 
+test('readPage: cells of a table row on their own baselines read as side lines', async () => {
+  // one ink band, two baselines, and no split can separate them: a cell in
+  // a taller face beside a shorter cell whose ink lies wholly inside the
+  // tall line's scan window (EFTA00173953 p20–26: two-line agency cells
+  // beside vertically centred dates, ~900 □). The band's pick reads the
+  // cell its probe anchor fell in; the other fails at THAT baseline, and
+  // its run of fails is re-probed on its own x-window over the baselines
+  // its ink rows allow — and read as a line of its own
+  const T = makeGlyph('T', ['####', '.##.', '.##.', '.##.', '.##.', '.##.', '.##.'], { dy: -7, adv: 6 });
+  const set = makeSet('synth', [...abcSet().byPhy.get(0), T]), page = makePage(400, 40);
+  drawWord(page, set, 'TAT', [10, 16, 22], 20);        // rows 13–19: the window is rows 13–19
+  drawWord(page, set, 'CBA', [300, 306, 312], 18);     // rows 13–17, inside it, two rows up
+  const { lines } = await E.readPage(page, [set], {});
+  const read = lines.filter(l => l.set).sort((a, b) => a.baseline - b.baseline);
+  assert.deepStrictEqual(read.map(l => [l.baseline, l.glyphs.map(g => g.ch).join(''), l.fails.length, !!l.side]),
+    [[18, 'CBA', 0, true], [20, 'TAT', 0, false]]);
+  assert.ok(read.every(l => l.clean), "both clean: the run's fails left the line they failed on");
+  assert.strictEqual(lines.filter(l => !l.set).length, 0, 'no unread band');
+});
+
+test('detectObjects: a rule crossing a redaction box is kept as a rule, and the box stays whole', () => {
+  // a table's horizontal border through a redacted column (EFTA00173953 p24):
+  // the border row joins the box object by overlap, the box segmentation
+  // keeps the box's own extent — and without this rule the border's stub had
+  // no mask and every cell row ended in a □ at it
+  const page = makePage(400, 120), W = 400;
+  for (let y = 10; y < 110; y++) for (let x = 300; x < 360; x++) page.gray[y * W + x] = 0;   // the box
+  for (let x = 20; x < 380; x++) page.gray[60 * W + x] = 84;                                    // the border (one row, dark)
+  const det = E.detectObjects(page);
+  const rules = det.objects.filter(o => o.type === 'rule'), boxes = det.objects.filter(o => o.type === 'box');
+  assert.deepStrictEqual(rules.map(o => [o.y0, o.y1, o.x0, o.x1]), [[60, 61, 20, 380]]);
+  assert.deepStrictEqual(boxes.map(o => [o.y0, o.y1, o.x0, o.x1]), [[10, 110, 300, 360]]);
+  assert.ok(det.mask[60 * W + 100] && det.mask[60 * W + 370], 'the border is masked outside the box');
+  assert.ok(!det.mask[40 * W + 100], 'the open page beside the box is not');
+});
+
 test("readPage: a line's boxes are its redaction boxes, not its rules", async () => {
   const set = abcSet(), page = makePage(160, 40);
   drawWord(page, set, 'AB', [10, 16], 20);

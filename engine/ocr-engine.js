@@ -328,6 +328,40 @@
           else ext.push([r.y, r.x0, r.x1]);
         }
       if (!ext.length) continue;
+      // CROSSING RULES. A thin run of rows whose raw extent is more than
+      // twice the box's on both sides of it is not a glyph glued to the bar:
+      // it is a rule crossing the box — a table's horizontal border (650 px,
+      // dark) through a redacted column (116 px, 800 rows; EFTA00173953 p24,
+      // 45 of them). The clip below rightly folds such rows into the box (the
+      // box stays whole), but then no object is left for the rule, its stub
+      // outside the box has no mask, and every cell row ends in □s there
+      // (p24: 335 □ → 49 with the rule kept). Judged on RAW extents before the
+      // clip — with 8+ borders their columns count as bar columns and the
+      // clip keeps them, with fewer it removes them; either way the rule is
+      // its own object from here. The neighbours are the nearest runs of 5+
+      // rows (the box's own segments) and must agree with each other: two
+      // stacked boxes' fused rows (`big` p339) have different boxes above and
+      // below and are not this. (Refusing the row merge upstream instead —
+      // a row within 2× of its object — cut those fused rows away from the
+      // upper box, whose body rows vouched for their columns, and a 13-px
+      // sliver of them went unmasked: `big` 0 □ → 1.)
+      {
+        const raw = [];
+        for (const [y, x0, x1] of ext) {
+          const s = raw[raw.length - 1];
+          if (s && y === s.y1 && Math.abs(x0 - s.x0) <= 2 && Math.abs(x1 - s.x1) <= 2) s.y1 = y + 1;
+          else raw.push({ y0: y, y1: y + 1, x0, x1 });
+        }
+        for (let m = 0; m < raw.length; m++) {
+          const b = raw[m];
+          if (b.y1 - b.y0 >= 5) continue;
+          let a = null, c = null;
+          for (let k = m - 1; k >= 0 && !a; k--) if (raw[k].y1 - raw[k].y0 >= 5) a = raw[k];
+          for (let k = m + 1; k < raw.length && !c; k++) if (raw[k].y1 - raw[k].y0 >= 5) c = raw[k];
+          if (a && c && Math.abs(a.x0 - c.x0) <= 2 && Math.abs(a.x1 - c.x1) <= 2 && b.x1 - b.x0 > 2 * (a.x1 - a.x0))
+            segmented.push({ y0: b.y0, y1: b.y1, x0: b.x0, x1: b.x1 });
+        }
+      }
       // Bar-body column profile. A glyph glued to the box's side — a quote
       // mark flush against a redaction bar, the tip of a '<' — is bridged
       // into that row's dark run across a ≤1px AA gap, so the row's raw
@@ -1964,6 +1998,22 @@
     // band of their own and read FIRST — the upper line lands in transcript
     // order and its ink is in `explained` before the lower line's scan
     // judges the shared rows.
+    // record a scanned line's explained ink — EXCEPT a fail blob's dead
+    // pixels: the flood absorbed them into the canvas (canvas = page there),
+    // but they are the □'s unexplained ink, not explained evidence
+    const recordExplained = (L) => {
+      const deadSet = new Set();
+      if (L.failPix) for (const dead of L.failPix.values()) for (const k of dead) deadSet.add(k);
+      const lw = L.xTo - L.xFrom;
+      for (let y = L.y0; y < L.y1; y++)
+        for (let x = L.xFrom; x < L.xTo; x++)
+          if (page.gray[y * page.w + x] < 255 &&
+              ACC.ok(y * page.w + x, L.canvas[(y - L.y0) * lw + (x - L.xFrom)], 0) &&
+              !deadSet.has(x << 16 | y)) {
+            explained[y * page.w + x] = 1;
+            explained._rows[y] = 1;
+          }
+    };
     const work = bands.map(([top, bot]) => ({ top, bot, pick: null }));
     for (let wi = 0; wi < work.length; wi++) {
       const { top, bot } = work[wi];
@@ -2271,19 +2321,7 @@
           }
         if (below > inBand) { pushUnread(); continue; }
       }
-      // record explained ink — EXCEPT a fail blob's dead pixels: the flood
-      // absorbed them into the canvas (canvas = page there), but they are the
-      // □'s unexplained ink, not explained evidence
-      const deadSet = new Set();
-      if (L.failPix) for (const dead of L.failPix.values()) for (const k of dead) deadSet.add(k);
-      for (let y = L.y0; y < L.y1; y++)
-        for (let x = L.xFrom; x < L.xTo; x++)
-          if (page.gray[y * page.w + x] < 255 &&
-              ACC.ok(y * page.w + x, L.canvas[(y - L.y0) * (L.xTo - L.xFrom) + (x - L.xFrom)], 0) &&
-              !deadSet.has(x << 16 | y)) {
-            explained[y * page.w + x] = 1;
-            explained._rows[y] = 1;
-          }
+      recordExplained(L);
       L.top = top; L.bot = bot; L.baseline = pick.yb; L.phy = pick.phy; L.set = pick.set;
       // a union pool has no per-band font identity — recover it per LINE by
       // majority vote over the byte-certified glyphs' source sets (a Times
@@ -2315,6 +2353,79 @@
       // remember this baseline's certified pick for the next page's hint
       if (carry) (carry.picks ??= new Map()).set(pick.yb, { set: pick.set, phy: pick.phy, below: pick.below });
       lines.push(L);
+      // ---- SIDE-BY-SIDE BASELINES (table cells) ----
+      // A table row is one ink band, but its cells sit on their own
+      // baselines: a two-line cell beside a vertically centred date
+      // (EFTA00173953 p20–26: ~900 □ in one memo). The band's pick reads
+      // whichever cell the probe anchor fell in and the rest of the row fails
+      // at THAT baseline, though every set in the pool reads it at its own.
+      // Each WIDE run of fails (two or more, or ≥ 14 px — one glyph is not a
+      // cell) is re-probed on its own x-window over the baselines its ink
+      // rows allow (bottom ink row + 1, up to maxDesc higher), every set and
+      // phase, and read as a line of its own when a probe reads and the scan
+      // over the run is clean. The retro-check below then retracts the fails
+      // that scan explained; a run nothing reads keeps its □ and costs a few
+      // probes. Runs touching a redaction halo are the box's own (fragments).
+      if (L.fails.length && L.failPix) {
+        const runs = [];
+        for (const c of L.fails) {
+          const dead = L.failPix.get(c);
+          if (!dead || !dead.length) continue;
+          let xa = Infinity, xb = -1, ya = Infinity, yb = -1;
+          for (const k of dead) { const x = k >> 16, y = k & 0xffff; if (x < xa) xa = x; if (x > xb) xb = x; if (y < ya) ya = y; if (y > yb) yb = y; }
+          const r = runs[runs.length - 1];
+          if (r && xa <= r.x1 + 12) { r.x1 = Math.max(r.x1, xb); r.y0 = Math.min(r.y0, ya); r.y1 = Math.max(r.y1, yb); r.n++; }
+          else runs.push({ x0: xa, x1: xb, y0: ya, y1: yb, n: 1 });
+        }
+        for (const r of runs) {
+          if (r.n < 2 && r.x1 - r.x0 + 1 < 14) continue;
+          if (halos.some(hl => r.x1 >= hl[0] && r.x0 < hl[1] && r.y1 >= hl[2] && r.y0 < hl[3])) continue;
+          // a cell stands beside the line's own glyphs, never among them: a
+          // run inside the read text (a missing dot, an underline sliver, the
+          // regular words of a line a BOLD-only rung read the label of) is
+          // that line's, and re-reading it at the SAME baseline with another
+          // set or phase would split the line into fragments — on the app's
+          // ladder a wrong-set rung then looked better than the union rung
+          // that read the whole line, and "To: Epstein Jeffrey <…>" came
+          // back as three lines missing "effrey" (EFTA00961975, 300-doc A/B)
+          if (L.glyphs.some(g => g.pen + g.adv > r.x0 - 4 && g.pen < r.x1 + 4)) continue;
+          let side = null;
+          const pxFrom = Math.max(0, r.x0 - 2), pxTo = Math.min(page.w, r.x1 + 20);
+          for (const set of sets)
+            for (const phy of set.byPhy.keys())
+              for (let yb = r.y1 + 1; yb >= r.y1 + 1 - set.maxDesc && yb > top; yb--) {
+                if (yb === pick.yb) continue;              // the line's own baseline is not a cell's
+                const score = probeBaseline(page, mask, set, phy, yb, pxFrom, pxTo, tol, quant, top, explained, clampBot, scanOpts);
+                if (score > 0 && (!side || score > side.score)) side = { set, phy, yb, score };
+              }
+          if (!side) continue;
+          const L2 = scanLine(page, mask, side.set, side.phy, side.yb,
+            pxFrom, Math.min(page.w, r.x1 + 4), Infinity, Infinity, tol, quant, halos, top, explained, clampBot, scanOpts);
+          // the run's □s are now the side line's to report: its glyphs are
+          // byte-certified at its own baseline and its fails are honest there
+          // ("10/23/014" with one □ where the row read nothing) — accepted
+          // when it leaves fewer □ than the run had, and the run's fails
+          // leave the line so nothing is counted twice
+          if (!L2.glyphs.length || L2.fails.length >= r.n) continue;
+          L.fails = L.fails.filter(c => { const d = L.failPix.get(c); if (!d || !d.length) return true;
+            let xa = Infinity, xb = -1; for (const k of d) { const x = k >> 16; if (x < xa) xa = x; if (x > xb) xb = x; }
+            return !(xa >= r.x0 && xb <= r.x1); });
+          L.clean = L.fails.length === 0 && L.residual === 0;
+          recordExplained(L2);
+          L2.top = top; L2.bot = bot; L2.baseline = side.yb; L2.phy = side.phy; L2.set = side.set;
+          {
+            const votes = new Map();
+            for (const g of L2.glyphs) if (g.src) votes.set(g.src, (votes.get(g.src) ?? 0) + 1);
+            L2.font = votes.size ? [...votes.entries()].sort((a, b) => b[1] - a[1])[0][0] : side.set.name;
+          }
+          L2.boxes = lineBoxes(lineObjects, side.yb);
+          L2.objects = lineObjects;
+          L2.clean = L2.fails.length === 0 && L2.residual === 0;
+          L2.side = true;
+          if (HAS_ENV && process.env.BR_PICK) console.error(`  side line y${side.yb} ${side.set.name} x${r.x0}-${r.x1} in band ${top}-${bot} (line y${pick.yb}): ${L2.glyphs.map(g => g.ch).join('')}`);
+          lines.push(L2);
+        }
+      }
     }
     if (carry) carry.last = last;
     if (PROF) { console.error(`  probes ${PROF.n}, ${PROF.ms} ms: ${Object.entries(PROF.by).map(([k, v]) => k + ' ' + v + 'ms').join(', ')}`); PROF.n = 0; PROF.ms = 0; PROF.by = {}; }
