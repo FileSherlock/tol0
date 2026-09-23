@@ -88,6 +88,18 @@ export const SETS = [
   // nimbusrom POOL below does not carry it yet (adding it is an intended gate
   // change — 38 → 30 □ measured in the predecessor — and gets its own commit)
   ['tnrbdlin1024', 'tnrbdlin_1024.npz'],
+  // EFTA00173953 (2026-09-23, lab/families.mjs `nimbusromlin942`): the same
+  // eDiscovery chain — mupdf, its built-in URW faces for an UNembedded Times
+  // New Roman, linear law, per-page palette — on a Word memo set at 11 pt:
+  // body 942, 10 pt header block 849, small caps 768. Exact on 9 of 10
+  // harvested glyphs; 0 → 1,026 lines on the document
+  ['nimbusromlin942', 'nimbusromlin_942.npz'],
+  ['nimbusromilin942', 'nimbusromilin_942.npz'],
+  ['nimbusrombdlin942', 'nimbusrombdlin_942.npz'],
+  ['nimbusromlin768', 'nimbusromlin_768.npz'],
+  ['nimbusromlin849', 'nimbusromlin_849.npz'],
+  ['nimbusromilin849', 'nimbusromilin_849.npz'],
+  ['nimbusrombdlin849', 'nimbusrombdlin_849.npz'],
   // court/ECF sub-family of the palette container (post: null, no linear) —
   // FINDINGS-nimbusrom.md §sub-family 2; body EXACT, bold/italic companions
   ['censcbk1198', 'censcbk_1198.npz'],               // Century Schoolbook 1198 — brief body
@@ -187,6 +199,10 @@ export const POOLS = {
   // srcover paragraph numbers (±1 quirk). NOTE: these docs' P1 is an ornate
   // cover that never reads — the P1 probe misses the family (EFTA00316714
   // surfaced as 'no-read'); probe interior pages when hunting by hand.
+  // EFTA00173953: an 11 pt Word memo through the mupdf/Nimbus/linear/palette
+  // chain — regular, italic and bold mix on one line (labels), small caps mix
+  // with their capitals; the 10 pt header block is its own band
+  nimbusrom942: { glyphs: 'nimbusromlin942+nimbusromilin942+nimbusrombdlin942+nimbusromlin768,nimbusromlin849+nimbusromilin849+nimbusrombdlin849', palette: true, tol: 0 },
   nimbusromCourt: { glyphs: 'nimbusrom1024+nimbusrombd1024+nimbusromi1024+nimbusromg35_1024',
     palette: true, tol: 2, probeMs: 20000 },
   // sans-body email family (lab/families.mjs): Arial 1194 body under
@@ -340,6 +356,13 @@ export const PROVENANCE = {
   nimbusromlin1024: { src: 'free', font: 'NimbusRoman-Regular.cff', em64: 1024, phasesY: '0', linear: true },
   nimbusrombdlin1024: { src: 'free', font: 'NimbusRoman-Bold.cff', em64: 1024, phasesY: '0', linear: true },
   nimbusromlin983: { src: 'free', font: 'NimbusRoman-Regular.cff', em64: 983, phasesY: '0', linear: true },
+  nimbusromlin942: { src: 'free', font: 'NimbusRoman-Regular.cff', em64: 942, phasesY: '0', linear: true },
+  nimbusromilin942: { src: 'free', font: 'NimbusRoman-Italic.cff', em64: 942, phasesY: '0', linear: true },
+  nimbusrombdlin942: { src: 'free', font: 'NimbusRoman-Bold.cff', em64: 942, phasesY: '0', linear: true },
+  nimbusromlin768: { src: 'free', font: 'NimbusRoman-Regular.cff', em64: 768, phasesY: '0', linear: true },
+  nimbusromlin849: { src: 'free', font: 'NimbusRoman-Regular.cff', em64: 849, phasesY: '0', linear: true },
+  nimbusromilin849: { src: 'free', font: 'NimbusRoman-Italic.cff', em64: 849, phasesY: '0', linear: true },
+  nimbusrombdlin849: { src: 'free', font: 'NimbusRoman-Bold.cff', em64: 849, phasesY: '0', linear: true },
   nimbusromilin1024: { src: 'free', font: 'NimbusRoman-Italic.cff', em64: 1024, phasesY: '0', linear: true },
   nimbusrombdlin1194: { src: 'free', font: 'NimbusRoman-Bold.cff', em64: 1194, phasesY: '0', linear: true },
   nimbussansbdlin1536: { src: 'free', font: 'NimbusSans-Bold.cff', em64: 1536, phasesY: '0', linear: true },

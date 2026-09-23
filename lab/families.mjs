@@ -183,6 +183,21 @@ export const FAMILIES = [
   { name: 'nimbusromilin1024', renderable: true, font: 'NimbusRoman-Italic.cff', em64: 1024, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusromilin1024' },
   { name: 'nimbusrombdlin1194', renderable: true, font: 'NimbusRoman-Bold.cff', em64: 1194, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusrombdlin1194' },
   { name: 'nimbussansbdlin1536', renderable: true, font: 'NimbusSans-Bold.cff', em64: 1536, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbussansbdlin1536' },
+  // A Word memo whose Times New Roman is NOT embedded, so mupdf drew its
+  // builtin Nimbus Roman: 11 pt body = em64 942 (14.72 px), 10 pt = 849, small
+  // caps 768, 8 pt = 685 (the red warning; not a set yet — see NEXT-bulk.md).
+  // Found from pixels alone: a law-free monotone fit named the face and size
+  // (METHOD rule 9), palettesweep.mjs gave the law and the ¼-px pens.
+  // Every lab prefilter had said "no m matches" — they compare before the
+  // page's palette (LAWS §4), and this page is palettized.
+  { name: 'nimbusromlin942', renderable: true, font: 'NimbusRoman-Regular.cff', em64: 942, fy: [0], gid: 'mupdf', law: 'fzLin254',
+    set: 'nimbusromlin942', record: 'EFTA00173953 — 69 pages, 978 lines, 46,721 glyphs (gate fbimemo; censused: fixtures/gate-ref/README.md)' },
+  { name: 'nimbusromilin942', renderable: true, font: 'NimbusRoman-Italic.cff', em64: 942, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusromilin942' },
+  { name: 'nimbusrombdlin942', renderable: true, font: 'NimbusRoman-Bold.cff', em64: 942, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusrombdlin942' },
+  { name: 'nimbusromlin768', renderable: true, font: 'NimbusRoman-Regular.cff', em64: 768, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusromlin768' },
+  { name: 'nimbusromlin849', renderable: true, font: 'NimbusRoman-Regular.cff', em64: 849, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusromlin849' },
+  { name: 'nimbusromilin849', renderable: true, font: 'NimbusRoman-Italic.cff', em64: 849, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusromilin849' },
+  { name: 'nimbusrombdlin849', renderable: true, font: 'NimbusRoman-Bold.cff', em64: 849, fy: [0], gid: 'mupdf', law: 'fzLin254', set: 'nimbusrombdlin849' },
   // The same pages also embed a REAL Times New Roman subset for ■ and curly
   // quotes, rendered at the same pens. METHOD rule 6 again.
   { name: 'tnrlin1024', renderable: true, font: 'times.ttf', em64: 1024, fy: [0], gid: 'cmap', law: 'fzLin254', set: 'tnrlin1024' },

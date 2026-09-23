@@ -66,6 +66,15 @@ const DOCS = [
     args: ['--pdf', corpus('courier_2.pdf'), '--all', '--glyphs', COURIER] },
   { name: 'nimbusrom', needs: [corpus('nimbusrom.pdf')], sets: NIMBUSROM,
     args: ['--pdf', corpus('nimbusrom.pdf'), '--all', '--palette', '--tol', '0', '--glyphs', NIMBUSROM] },
+  // EFTA00173953 (2026-09-23): a 69-page Word memo through the eDiscovery
+  // native-render chain — mupdf, its built-in URW Nimbus Roman for an
+  // UNembedded Times New Roman, the linear law, a palette per page. Read with
+  // the family's pool (registry nimbusrom942: 11 pt body/italic/bold + small
+  // caps, 10 pt header block); what stays □ is the agency seal's residue, the
+  // 8 pt RED warning blocks (the colour law without this family's +1 — open),
+  // dingbat checkboxes, and text inside black redaction blocks.
+  { name: 'fbimemo', needs: [corpus('EFTA00173953.pdf')], sets: POOLS.nimbusrom942.glyphs,
+    args: ['--pdf', corpus('EFTA00173953.pdf'), '--all', '--pool', 'nimbusrom942'] },
   ...N791.map(id => ({
     name: `n791_${id}`, needs: [n791(`${id}.pdf`), n791(`${id}.txt`)],
     sets: POOLS.nimbus791.glyphs,

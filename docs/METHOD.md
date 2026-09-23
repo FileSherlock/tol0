@@ -1,6 +1,6 @@
 # Method
 
-Eight rules. Each one was paid for — most of them twice — and none of them is
+Nine rules. Each one was paid for — most of them twice — and none of them is
 specific to OCR. They are the part of this project that transfers.
 
 **1. Trust pixels only.** Every written constant is a copy of a measurement, and
@@ -10,8 +10,8 @@ supersedes. This repo's own "8 snap phases" survived months of work and is
 [4](LAWS.md#1-the-pen-lattice).
 
 **2. A byte-identical regression gate beats a suite of assertions.** `npm run
-gate` re-reads 18 fixed documents and byte-compares whole transcripts against
-committed references: **33,736 lines, 2,436,383 glyphs, 177 □ (149 of them coloured ink), 55 s**. The
+gate` re-reads 19 fixed documents and byte-compares whole transcripts against
+committed references — the 18 certified ones: **33,736 lines, 2,436,390 glyphs, 161 □ (139 of them coloured ink), ~1 min** (the 19th holds a family read still, not a clean one). The
 expected numbers *are the reference files*, so there is no threshold to argue
 about and any change in any number is the signal. It has caught every accidental
 regression, including one a plausible-looking simplification would have shipped
@@ -54,6 +54,16 @@ answer, the advance-vector prefilter put the true face at **rank 15 of 387** and
 got its size off by one. Excellent as a top-25 filter, worthless as a verdict.
 Treat a screen's output as an ordering and confirm the winner by rendering.
 
+**9. Compare where the producer wrote, and fit what you do not know.** An
+exact comparison must pass through every stage the producer did: a palettized
+page holds `Q(law(coverage))`, and every sweep that compared `law(coverage)`
+said "no match" to a known family at a new size for a day. When the law is the
+unknown, do not guess it — a monotone (isotonic) fit of coverage → byte is
+law-free and still names face and size, *provided each target sits at its own
+sub-pixel phase*: one shared phase made the right face look 20 bytes wrong,
+and every wrong face look the same. The residual of the true face was 0.0–0.1
+bytes; the nearest impostor's, 3.
+
 ## The shape these add up to
 
 Every layer certifies itself against the layer below, and the bottom layer
@@ -61,10 +71,10 @@ certifies itself against the real thing:
 
 ```
 ftclone   vs mupdf fillText          npm run certify:ftclone   0 diffs / 1128 renders
-engine    vs synthetic pages          npm test                  43 tests, ~40 ms
-reader    vs committed transcripts    npm run gate              18/18 byte-identical
+engine    vs synthetic pages          npm test                  49 tests, ~40 ms
+reader    vs committed transcripts    npm run gate              19/19 byte-identical
 Recto     vs this repo's files        npm run sync:recto:check  cmp-identical
 ```
 
 Nothing in the stack is trusted because it looks right. That is the entire
-method, and rules 1–8 are what it costs to keep it true.
+method, and rules 1–9 are what it costs to keep it true.

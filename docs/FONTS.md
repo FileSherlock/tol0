@@ -2,7 +2,7 @@
 
 Short version: **this repo ships every font and glyph set it is allowed to ship,
 and tells you exactly how to rebuild the rest from your own machine.** A fresh
-clone has 13 of 77 glyph sets. That is not an oversight.
+clone has 20 of 84 glyph sets. That is not an oversight.
 
 ## Why a glyph set is a licence question
 
@@ -27,7 +27,7 @@ Every set's origin is in `PROVENANCE` in
 
 | class | n | ships? | how you get it |
 |---|---:|---|---|
-| `free` | 13 | **yes** | already here; face is in `fonts/` |
+| `free` | 20 | **yes** | already here; face is in `fonts/` |
 | `system` | 48 | no | regenerate from your own stock system font |
 | `build` | 10 | no | needs one *specific* font build, not the current install |
 | `corpus` | 6 | **never** | cut from document pixels — no reproduction path |
@@ -35,20 +35,20 @@ Every set's origin is in `PROVENANCE` in
 ```bash
 node tools/glyph-sets.mjs            # what you have and what you don't
 node tools/glyph-sets.mjs --plan     # the exact command for each missing set
-node tools/glyph-sets.mjs --verify   # prove the shipped 13 rebuild byte-exactly
+node tools/glyph-sets.mjs --verify   # prove the shipped 20 rebuild byte-exactly
 ```
 
 ### free — and provably so
 
-The 13 shipped sets derive from URW Nimbus (Roman, Sans, Mono — the base-35
+The 20 shipped sets derive from URW Nimbus (Roman, Sans, Mono — the base-35
 faces Ghostscript and mupdf embed) and DejaVu Serif. Both are redistributable
 and both faces are in [`fonts/`](../fonts), so `--verify` re-renders each set
 through `fontgen` and byte-compares the bundle payload — the bytes the engine
 actually reads — rather than asking you to take it on trust. It runs the same
 recipe `--plan` prints, so what is verified is the documented path.
 
-Two certified pools (`nimbus791`, `nimbusromCourt`) are entirely free, so they
-work on a fresh clone.
+Three certified pools (`nimbus791`, `nimbusromCourt`, `nimbusrom942`) are
+entirely free, so they work on a fresh clone.
 
 ### system — regenerate from your own fonts
 

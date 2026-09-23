@@ -20,12 +20,20 @@ node lab/harvest.mjs --doc mystery --out h1  #    ground-truth glyph windows
 node lab/identify.mjs --targets h1           # 3. try every answer we already have
 node lab/identify.mjs --targets h1 --scan tahoma.ttf     # 4. right face, unknown size
 node lab/sweep.mjs --targets h1 --fonts all              # 5. the exhaustive net
+node lab/palettesweep.mjs --pdf mystery.pdf --targets h1 --fonts NimbusRoman-Regular.cff   # 5b. the same, THROUGH the page's palette
 ```
 
 **Stop as soon as something answers.** Step 1 alone has closed hunts — the
 Tahoma family, the largest tol-0 population in the corpus, was found by the m
 bank and proven the same day. Steps 2–5 cost progressively more, and step 5
 costs hours.
+
+**On a palettized page — 62 % of this corpus — steps 1, 3, 4 and 5 are blind.**
+They compare `law(coverage)` to the page, and the page holds `Q(law(coverage))`
+(LAWS §4). Every one of them said "no `m` matches" to a 69-page memo that was
+a known family at a new size; `palettesweep.mjs` applies each target page's
+own Q before comparing and found it. When the law is unknown as well, pin face
+and size first with a law-free fit (METHOD rule 9), then come for the law.
 
 Two of those steps have a fast twin in **[rust/](rust/)**, which is the same
 search certified against this JavaScript: `hunt sweep` is step 5 at 40–45×, and
@@ -38,7 +46,7 @@ build the glyph set with `tools/fontgen.mjs`, add a pool to
 `tools/glyph-registry.mjs`, and let `npm run gate` hold it still. **The lab
 does not read documents; the reader does.**
 
-## The eight, and the engine
+## The nine, and the engine
 
 | | |
 |---|---|
@@ -47,6 +55,7 @@ does not read documents; the reader does.**
 | [harvest.mjs](harvest.mjs) | pages → byte-identical glyph windows you can call ground truth |
 | [identify.mjs](identify.mjs) | targets → every proven family, then an em64 scan of one face |
 | [sweep.mjs](sweep.mjs) | targets → every (face, em64, pen, law), when nothing known fits |
+| [palettesweep.mjs](palettesweep.mjs) | the same, through each target page's palette — the only exact sweep that can see a palettized page |
 | [families.mjs](families.mjs) | the answers so far, as data — and the blend laws (six names, four distinct maps) |
 | [pgm.mjs](pgm.mjs) | the pixel container, and one definition of ink |
 | [selftest.mjs](selftest.mjs) | `npm run lab:selftest` — the whole loop, on a known answer |

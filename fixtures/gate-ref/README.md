@@ -6,7 +6,9 @@ document and byte-compares its whole transcript (`<name>.txt`) and its counts
 tune and no threshold to argue about: any change in any number is the signal.
 
 Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
-2026-09-21, `nimbusrom` 2026-09-23 — see below):
+2026-09-21, `nimbusrom` 2026-09-23 — see below; `fbimemo`, added 2026-09-23,
+is a regression guard for a family read, not a certified document — see the
+end of this file):
 
 | | lines | glyphs | □ |
 |---|---:|---:|---:|
@@ -18,7 +20,8 @@ Recorded 2026-07-26 (step 4 of the port), 18 documents (`email` re-recorded
 | courier_2 | 4,899 | 374,462 | 0 |
 | nimbusrom | 223 | 13,034 | 155 (135 coloured) |
 | nimbus791 block (11 docs) | 5,028 | 356,579 | 0 |
-| **total** | **33,736** | **2,436,390** | **161 (139 coloured)** |
+| fbimemo | 978 | 46,721 | 3,807 (415 coloured) |
+| **total (the 18 certified)** | **33,736** | **2,436,390** | **161 (139 coloured)** |
 
 ~55 s — the one number here that is *not* compared, because it is the machine's,
 not the reader's. The 11 `nimbus791` documents also carry truth transcripts, and every one
@@ -236,6 +239,22 @@ converted ink is adopted as that ink. `email` moved, alone:
   underline's ±2-row padding, which rules keep blanket on purpose.
 
 The other 17 documents are byte-identical, summaries included.
+
+## `fbimemo` — a family read, held still (2026-09-23)
+
+`EFTA00173953.pdf` (69 pages; not distributed — gitignored under
+`fixtures/corpus/`) is a Word memo through the eDiscovery native-render chain:
+mupdf, its built-in URW Nimbus Roman standing in for an unembedded Times New
+Roman, the linear law, a palette per page — `lab/families.mjs`
+`nimbusromlin942`, found from pixels alone in one day (the method is in
+`lab/palettesweep.mjs` and docs/METHOD.md). Read with the registry's
+`nimbusrom942` pool. **978 lines, 46,721 glyphs, 3,807 □** — it is far from
+clean, and the entry exists so that number cannot drift unnoticed: 415 of the
+□ are the 8 pt red warning blocks (Nimbus at em64 685; they read at ±2 and not
+at 0, because the colour inversion in `colourInk` does not yet apply this
+family's +1 — open), ~900 are the agency seal's converted colour (the whitened
+part is masked — see `nimbusrom` above), the rest dingbat checkboxes, table
+borders and text inside black redaction blocks.
 
 **`nimbusrom` 161 □ → 155 (2026-09-23):** the neutral pieces of the DOJ seal
 that survive whitening — a big component whose padded bbox is ≥ 15 % whitened
