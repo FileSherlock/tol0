@@ -21,6 +21,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { rectoLayout } from './recto-layout.mjs';
+import { corpusPdf } from './pdfs.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, '..');
@@ -118,7 +119,7 @@ async function run() {
     // Upload the certified test document through the real file input — the
     // OCR verdict must not depend on whatever document the app opens by
     // default (that is Recto-side and swappable).
-    const TEST_PDF = join(REPO, 'fixtures', 'corpus', 'nimbus791', 'EFTA00751637.pdf');
+    const TEST_PDF = corpusPdf('nimbus791/EFTA00751637.pdf');
     if (!existsSync(TEST_PDF)) throw new Error(`test document missing: ${TEST_PDF}`);
     const fileInput = await page.$('#pdf-file');
     if (!fileInput) throw new Error('#pdf-file input not found');
@@ -181,15 +182,19 @@ async function run() {
       failed = true;
     }
 
+    // The two pixel-view switches live in Recto's Settings panel (since
+    // 2026-09-22), hidden until it opens: click them through the DOM, as
+    // Recto's own smoke test does (a puppeteer click needs a visible element).
+    const clickSwitch = sel => page.evaluate(s => document.querySelector(s).click(), sel);
     // MuPDF pixel view: drive the real toggles, then ask the adapter for its
     // per-box verdicts. Every byte-clean OCR box must reproduce the page with
     // ZERO differing pixels — the overlay IS the page — measured against the
     // raster the viewer actually shows, through the same whitening the reader
     // used. Then toggling off must restore the SVG text.
-    await page.click('#ocr-pixel-view');
+    await clickSwitch('#ocr-pixel-view');
     await page.waitForFunction(() => PixelView.state.on && !PixelView.state.loading &&
       OCRTool.state.sets !== null && document.querySelectorAll('.utb-pixel').length > 0);
-    await page.click('#ocr-pixel-diff');
+    await clickSwitch('#ocr-pixel-diff');
     await page.waitForFunction(() => PixelView.state.diff);
     const pv = await page.evaluate(() => {
       const v = PixelView.verdict(state.currentPage);
@@ -209,7 +214,7 @@ async function run() {
       console.error('  FAIL: MuPDF pixel view —', JSON.stringify(pv.bad), pv.status);
       failed = true;
     }
-    await page.click('#ocr-pixel-view');
+    await clickSwitch('#ocr-pixel-view');
     const leftOver = await page.evaluate(() => document.querySelectorAll('.utb-pixel').length);
     if (leftOver !== 0) { console.error(`  FAIL: ${leftOver} pixel images left after toggling off`); failed = true; }
 

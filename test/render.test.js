@@ -455,6 +455,30 @@ test('layoutLine + lineLayout: a union line — each glyph its own set and law',
   assert.deepStrictEqual(lay.glyphs.map(g => g.set.name), ['hmbd', 'hmbd', 'hm', 'hm']);
 });
 
+test('lineLayout: a set change inside a word is no word break — two builds of one face in one word', () => {
+  // the reader's union pool took this word's glyphs from two builds of the
+  // same face at the same size (alike advances, other bitmaps): "ABBA" drawn
+  // A(hm) B(hm2) B(hm) A(hm2), then a space and "AB"; the producer laid
+  // "ABBA" as ONE run from one start
+  const hm = hmSet(), hm2 = { ...hmSet(), name: 'hm2' };
+  const m = { quant: 1000, scale: 1, kern: new Map() };
+  const ents = [];
+  let x = 41.13, i = 0;
+  for (const [ch, src, st] of [['A', 'hm', hm], ['B', 'hm2', hm2], ['B', 'hm', hm], ['A', 'hm2', hm2], [' '], ['A', 'hm', hm], ['B', 'hm', hm]]) {
+    if (ch === ' ') { x += 4.17; i++; continue; }
+    ents.push({ i: i++, ch, pen: R.snapX(x), adv: R.advanceOf(st, ch), src });
+    x += R.lawAdv(R.advanceOf(st, ch), 16, m);
+  }
+  const bySrc = new Map([['hm', { sizePx: 16, m }], ['hm2', { sizePx: 16, m }]]);
+  assert.strictEqual(R.wordsOf({ entries: ents }).length, 5);            // the learner's words: a set change breaks them
+  const ll = R.lineLayout({ entries: ents }, 16, m, 4, bySrc);
+  assert.ok(ll.feasible && ll.words === 2, `two words, not ${ll.words}`);
+  assert.strictEqual(ll.spaceWidths.length, 1);                           // one width, for the one real space
+  const lay = R.layoutLine(hm, 'ABBA AB', ents[0].pen + ll.delta, { metrics: m, spaceWidths: ll.spaceWidths,
+    glyphSets: [hm, hm2, hm, hm2, hm, hm], metricsBySet: new Map([['hm', m], ['hm2', m]]) });
+  assert.deepStrictEqual(lay.glyphs.map(g => g.pen), ents.map(e => e.pen));
+});
+
 test('layoutLine: a law (quantization, scale, kern) and per-space widths', () => {
   const set = abcSet();   // adv 6 at 16 px = 375/1000 em exactly: quant leaves it, scale moves it
   const L = R.layoutLine(set, 'AB', 0, { metrics: { quant: 1000, scale: 1.01, kern: new Map([['AB', -0.5]]) } });

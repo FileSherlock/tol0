@@ -23,9 +23,11 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 import { POOLS, SETS, poolSetNames } from './glyph-registry.mjs';
+import { corpusPdf } from './pdfs.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const corpus = f => join(REPO, 'fixtures', 'corpus', f);
+// PDFs from the shared PDF folder (tools/pdfs.mjs), transcripts from fixtures/corpus
+const corpus = f => f.endsWith('.pdf') ? corpusPdf(f) : join(REPO, 'fixtures', 'corpus', f);
 
 // Certified family read commands come from the ONE registry
 // (tools/glyph-registry.mjs), so a gate document can never drift from the
@@ -44,7 +46,7 @@ const NIMBUSROM = POOLS.nimbusrom.glyphs;
 const N791 = ['EFTA00751637', 'EFTA00751644', 'EFTA00751650', 'EFTA00751656',
   'EFTA00754398', 'EFTA00754462', 'EFTA00754474', 'EFTA00756928',
   'EFTA00756935', 'EFTA00756958', 'EFTA00756980'];
-const n791 = f => join(REPO, 'fixtures', 'corpus', 'nimbus791', f);
+const n791 = f => f.endsWith('.pdf') ? corpusPdf(`nimbus791/${f}`) : join(REPO, 'fixtures', 'corpus', 'nimbus791', f);
 
 // `needs` lists every fixture the document requires; `sets` every glyph set.
 // Both are checked BEFORE the reader runs, so a missing one is reported as

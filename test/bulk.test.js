@@ -170,7 +170,9 @@ test('slim: a page comes back exactly — keys, order, pens, clips — and what 
   assert.ok(JSON.stringify(slim).length < JSON.stringify(page).length);
 });
 
-const doc = join(REPO, 'fixtures', 'corpus', 'nimbus791', 'EFTA00751637.pdf');
+// the shared PDF folder first (tools/pdfs.mjs — the same lookup), else fixtures/corpus
+const sharedDoc = join(process.env.PDFS || join(REPO, '..', 'pdfs'), 'EFTA00751637.pdf');
+const doc = existsSync(sharedDoc) ? sharedDoc : join(REPO, 'fixtures', 'corpus', 'nimbus791', 'EFTA00751637.pdf');
 const bundle = join(REPO, 'assets', 'glyphs', 'glyphs.bin');
 test('bulk read IS blind-read: same pages from a persistent worker, no raster cache in between', { skip: !existsSync(doc) || !existsSync(bundle) ? 'needs fixtures/corpus/nimbus791/EFTA00751637.pdf and the bundle' : false }, async () => {
   const { readRecords } = await import('../tools/bulk/sink.mjs');

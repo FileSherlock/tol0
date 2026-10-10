@@ -17,7 +17,8 @@ import { existsSync, rmSync } from 'node:fs';
 
 const LAB = new URL('.', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1').replace(/\/$/, '');
 const ROOT = LAB.replace(/\/lab$/, '');
-const DOC = `${ROOT}/fixtures/corpus/nimbus791/EFTA00751637.pdf`;
+const { corpusPdf } = await import(`${ROOT}/tools/pdfs.mjs`);
+const DOC = corpusPdf('nimbus791/EFTA00751637.pdf');
 const HUNT = '_selftest';
 
 if (!existsSync(DOC)) {
@@ -75,8 +76,8 @@ if (!existsSync(`${LAB}/m-bank.json`)) {
   console.log('  (building the m bank — first run only)');
   run('mbank.mjs', 'build');
 }
-const scan = run('mbank.mjs', 'scan', DOC, `${ROOT}/fixtures/corpus/big.pdf`,
-  `${ROOT}/fixtures/corpus/courier_1.pdf`, `${ROOT}/fixtures/corpus/nimbusrom.pdf`);
+const scan = run('mbank.mjs', 'scan', DOC, corpusPdf('big.pdf'),
+  corpusPdf('courier_1.pdf'), corpusPdf('nimbusrom.pdf'));
 const verdictOf = doc => /(\S+)@(\d+)=/.exec(scan.split('\n').find(l => l.startsWith(doc)) ?? '')?.slice(1, 3).join('@');
 ok('m-bank: EFTA00751637', verdictOf('EFTA00751637') === 'lab:NimbusMonoPS-Regular@791', verdictOf('EFTA00751637'));
 ok('m-bank: big.pdf', /^times/.test(verdictOf('big') ?? '') && /@1024$/.test(verdictOf('big') ?? ''), verdictOf('big'));
