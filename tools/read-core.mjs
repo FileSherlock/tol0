@@ -68,7 +68,7 @@ export function pageFromRecord(mode, w, h, body, note = m => console.error(m)) {
       note(`  (colour page: ${c.convertedN} coloured px read as coverage through ${c.pens.length} pen${c.pens.length === 1 ? '' : 's'}` +
         (c.pens.length ? ` [${c.pens.map(p => p.slice(0, 3).join(',')).join(' ')}]` : '') + `, ${c.removed} whitened)`);
     return { w, h, gray: c.gray, converted: c.convertedN ? c.converted : null,
-      bandLo: c.bandLo, bandHi: c.bandHi, whitened: c.removed ? c.whitened : null };
+      bandLo: c.bandLo, bandHi: c.bandHi, whitened: c.removed ? c.whitened : null, lost: c.lost };
   }
   if (mode !== 3) throw new Error(`mode ${mode} unsupported`);
   // mode 3: u16 R+G+B sums + u8 per-pixel channel spread (max−min). Real

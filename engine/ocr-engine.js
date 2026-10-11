@@ -390,7 +390,50 @@
           if (any) body++;
         }
         const need = Math.min(8, body);
-        const bar = x => x >= o.x0 && x < o.x1 && colDark[x - o.x0] >= need;
+        // …and a TALL glyph glued to the side is dark on more than 8 rows: a
+        // '(' against a bar (Calibri 12 pt, 2026-10-11) had two columns dark
+        // on 9 of 19, passed, went under the mask with the bar, and its line
+        // certified without it. Such a glyph is a run of those columns
+        // narrower than any bar (a one-character redaction is 9 px) cut off
+        // from the bar body by a column that is not the bar's — beyond the
+        // first or last wide run. A wider stacked box's protrusion and a
+        // skewed edge are contiguous with the body and stay; two bars side
+        // by side are both wide. Only for a BAR — a wide run holding five
+        // columns dark on every body row (one spared): a shaded table cell
+        // is light rules around dark text, its "bar" columns are letter
+        // stems, and it keeps the rule above (fbimemo: 29 header cells).
+        const isBar = new Uint8Array(bw);
+        for (let k = 0; k < bw; k++) isBar[k] = colDark[k] >= need ? 1 : 0;
+        {
+          const runs = [];
+          for (let k = 0; k < bw; ) {
+            if (!isBar[k]) { k++; continue; }
+            let e = k;
+            while (e < bw && isBar[e]) e++;
+            runs.push([k, e]); k = e;
+          }
+          const full = (a, b) => { let n = 0; for (let k = a; k < b; k++) if (colDark[k] >= body - 1) n++; return n; };
+          const wide = runs.filter(([a, b]) => b - a >= 5 && full(a, b) >= 5);
+          if (wide.length) {
+            // outward from the bar's edge, runs no wider than a glyph within
+            // two columns of it (the row runs bridge one) — further out are
+            // other things (a table's vertical line, another cell's text),
+            // which hold a crossing border's row extent as before
+            let edge = wide[0][0];
+            for (let m = runs.indexOf(wide[0]) - 1; m >= 0; m--) {
+              const [a, b] = runs[m];
+              if (b - a >= 5 || edge - b > 2) break;
+              isBar.fill(0, a, b); edge = a;
+            }
+            edge = wide[wide.length - 1][1];
+            for (let m = runs.indexOf(wide[wide.length - 1]) + 1; m < runs.length; m++) {
+              const [a, b] = runs[m];
+              if (b - a >= 5 || a - edge > 2) break;
+              isBar.fill(0, a, b); edge = b;
+            }
+          }
+        }
+        const bar = x => x >= o.x0 && x < o.x1 && isBar[x - o.x0] === 1;
         for (const e of ext) {
           while (e[1] < e[2] && !bar(e[1])) e[1]++;
           while (e[2] > e[1] && !bar(e[2] - 1)) e[2]--;
@@ -445,6 +488,57 @@
         if (o.x0 >= b.x0 - 2 && o.x1 <= b.x1 + 2)
           cov += Math.max(0, Math.min(o.y1, b.y1) - Math.max(o.y0, b.y0));
       if (cov > 0.6 * (o.y1 - o.y0)) objects.splice(i, 1);
+    }
+    // SHORT UNDERLINES (2026-10-11). An underline under one short word —
+    // `not`, 20 px of Times 12 pt — is under the 40-px run rule, so its
+    // stroke was ink no glyph explains and its line read `will □not`. A
+    // strict dark run of 9–39 px is an underline when it is one: 1–3 flat
+    // rows (each one byte ±8 along the run, as a rule's AA rows are) under
+    // a word — dark ink on 40 % of its columns in the 2–3 rows above — and
+    // apart from it: the rows just above and below are white but where a
+    // descender crosses (ink on both sides of the stroke). A letter's own
+    // horizontal (an E's foot, a z's base) joins its stem and fails the
+    // crossing test; an em dash or an underscore has no word over it.
+    {
+      const at = (x, y) => gray[y * w + x];
+      const seen = new Set();
+      for (const r of shortRuns) {
+        if (r.wide || seen.has(r.y * w + r.x0)) continue;
+        const { x0, x1 } = r;
+        // an object's own rows — or a piece of a long underline a descender
+        // broke (the `htt` of an underlined `http://` before the `p`): the
+        // long rule's business, as before (masked, it moved that e-mail
+        // line's baseline half a pixel)
+        if (objects.some(o => r.y >= o.y0 - 2 && r.y < o.y1 + 2 &&
+            x0 < o.x1 + (o.y1 - o.y0 <= 4 ? 12 : 2) && x1 > o.x0 - (o.y1 - o.y0 <= 4 ? 12 : 2))) continue;
+        // the stroke's rows: flat and not white, up and down from the run
+        const flatRow = y => {
+          if (y < 0 || y >= h) return false;
+          let mn = 255, mx = 0;
+          for (let x = x0; x < x1; x++) { const v = at(x, y); if (v < mn) mn = v; if (v > mx) mx = v; }
+          return mx - mn <= 8 && mn < 250;
+        };
+        let y0 = r.y, y1 = r.y + 1;
+        while (y0 > 0 && r.y - y0 < 2 && flatRow(y0 - 1)) y0--;
+        while (y1 < h && y1 - y0 < 3 && flatRow(y1)) y1++;
+        if (y0 < 9 || y1 >= h - 1) continue;
+        // apart: white above and below but at crossings, and few of those
+        let cross = 0, ok = true;
+        for (let x = x0; x < x1 && ok; x++) {
+          const up = at(x, y0 - 1) < 200, dn = at(x, y1) < 200;
+          if (up && dn) cross++;
+          else if (up || dn) ok = false;
+        }
+        if (!ok || cross > 0.3 * (x1 - x0)) continue;
+        // a word over it: its letters' feet in the two rows over the clean
+        // one (8 rows up also took the bar over an `=` sign's top stroke)
+        let over = 0;
+        for (let x = x0; x < x1; x++)
+          for (let y = y0 - 3; y <= y0 - 2; y++) if (at(x, y) < 160) { over++; break; }
+        if (over < 0.4 * (x1 - x0)) continue;
+        for (const q of shortRuns) if (q.y >= y0 && q.y < y1 && q.x0 < x1 && q.x1 > x0) seen.add(q.y * w + q.x0);
+        objects.push({ y0, y1, x0, x1 });
+      }
     }
     // Graphic residue (whitened-color pages): a colored emblem or rule whose
     // neutral-gray pixels survive whitening leaves (a) DUST — scattered ≤4×4
@@ -1088,6 +1182,9 @@
     const pageAt = (x, y) => page.gray[y * W + x];
     const convAt = page.converted ? (x, y) => page.converted[y * W + x] : () => 0;
     const masked = (x, y) => skip[(y - y0) * bw + (x - xFrom)];
+    // the pad cells an accepted glyph's own ink lies on (A PAD HIDES NO
+    // GLYPH, at the end) — final scans of a line with a lone rule only
+    const padCov = !pooled && rules ? new Uint8Array(n) : null;
     const canAt = (x, y) => canvas[(y - y0) * bw + (x - xFrom)];
     const shAt = (x, y) => (lin ? shifts[(y - y0) * bw + (x - xFrom)] : 0);
     const addSh = (x, y, s) => { if (lin) shifts[(y - y0) * bw + (x - xFrom)] += s; };
@@ -1768,6 +1865,7 @@
         const x = gx + cc, y = gy + rr;
         if (masked(x, y)) {                              // keep page bytes under objects
           const mi = (y - y0) * bw + (x - xFrom);
+          if (padCov && mask[y * W + x] === 4) padCov[mi] = 1;
           if (skip[mi] === 2) (revive ??= new Uint8Array(bw * bh))[mi] = 1;
           continue;
         }
@@ -1872,6 +1970,44 @@
     // register), so the residual is just its sum — no second full-window scan.
     let residual = 0;
     for (let x = 0; x < bw; x++) residual += unexpl[x];
+    // A PAD HIDES NO GLYPH (2026-10-11). A lone rule's pad rows are
+    // don't-care (LAWS §9), so a glyph mostly inside them that no candidate
+    // reads leaves a pixel or two outside — absorbed — and its line
+    // certified without it (`Tuesday, May 8` underlined: the comma, one byte
+    // off at its best pen, gone from a clean line). Dark pad ink that no
+    // accepted glyph's own ink lies on, on this line's underline rows (from
+    // just over the baseline down) where the pad is white along the rule
+    // rather than the rule's own AA, is residual: the line still reads, it
+    // does not certify.
+    if (padCov) {
+      let padInk = 0;
+      for (let y = Math.max(y0, baseline - 3); y < y1; y++) {
+        // the row's pad cells no glyph lies on: white there, or the rule's
+        // own anti-aliasing (then the row is the rule's, and skipped)
+        let n4 = 0, white = 0;
+        for (let x = xFrom; x < xTo; x++)
+          if (mask[y * W + x] === 4 && !padCov[(y - y0) * bw + (x - xFrom)]) { n4++; if (pageAt(x, y) >= 240) white++; }
+        if (!n4 || white < 0.6 * n4) continue;
+        for (let x = xFrom; x < xTo; x++)
+          if (mask[y * W + x] === 4 && pageAt(x, y) < 160 && !padCov[(y - y0) * bw + (x - xFrom)]) {
+            padInk++;
+            if (DBG_LINE === baseline) console.log(`    pad ink (${x},${y}) ${pageAt(x, y)}`);
+          }
+      }
+      if (padInk >= 2) residual += padInk;
+    }
+    // …nor does colour whitening (LOST INK, colourInk): a whitened
+    // component's dark core between the line's first and last glyph, on its
+    // band's rows, is ink the line does not explain — `offices marked
+    // ████ are` with the light-blue word whitened read clean.
+    if (!pooled && page.lost && glyphs.length) {
+      const last = glyphs[glyphs.length - 1];
+      const gx0 = Math.max(xFrom, Math.floor(glyphs[0].pen)), gx1 = Math.min(xTo, Math.ceil(last.pen + last.adv));
+      let lostInk = 0;
+      // (not under an object: a bar's own edge column can carry a tint)
+      for (let y = cTop; y < cBot; y++) for (let x = gx0; x < gx1; x++) if (page.lost[y * W + x] && !mask[y * W + x]) lostInk++;
+      if (lostInk >= 4) residual += lostInk;
+    }
     return { glyphs, fails, frags, failPix, colourFails, residual, canvas, y0, y1, xFrom, xTo };
   }
 
@@ -2553,13 +2689,20 @@
         hist.set(k, (hist.get(k) || 0) + 1);
       }
     const cand = [];
-    for (const [k, c] of hist) if (c >= 20) cand.push({ C: [k >> 16, (k >> 8) & 255, k & 255], c });
+    // 12 fully covered pixels of one colour make a pen (20 until 2026-10-11:
+    // a short light-blue word, `blue` in #2e75b6 Georgia 12 pt, has 18 and
+    // was whitened from its certified line; on recto-eval's 90 colour pages
+    // no other page changes down to 4). Not lower: a thin Courier link's
+    // most repeated "fully covered" colour is a partial coverage of its pen,
+    // 9 times — a wrong pen.
+    for (const [k, c] of hist) if (c >= 12) cand.push({ C: [k >> 16, (k >> 8) & 255, k & 255], c });
     cand.sort((a, b) => (a.C[0] + a.C[1] + a.C[2]) - (b.C[0] + b.C[1] + b.C[2]));
     const pens = [];
     for (const q of cand) if (!pens.some(p => fitE(p.C, q.C[0], q.C[1], q.C[2])[1] <= 1)) pens.push(q);
     const comp = new Int32Array(N).fill(-1);           // coloured components: the whitening flood's own set
     const penOf = new Map();                           // converted pixel -> the pen that explained it
     const orphans = [];                                // tiny whitened components, revisited below
+    const lostCores = [];                              // whitened components with a text's dark core
     let removed = 0, convertedN = 0;
     const whitened = new Uint8Array(w * h);      // colour no pen explained (a graphic's) — detectObjects reads it
     const stack = [];
@@ -2602,6 +2745,7 @@
         }
       } else {
         for (const i of members) { gray[i] = 255; removed++; whitened[i] = 1; }
+        if (core.length >= 4) lostCores.push(core);
         // …unless it is a DOT. The dark-core rule above needs four dark
         // pixels, and the dot of an 'i', a period or a colon has one or two:
         // on a blue link they were whitened while the word around them was
@@ -2637,6 +2781,13 @@
         penOf.set(i, pi);
       }
     }
+    // LOST INK (2026-10-11): a whitened component with a text's dark core
+    // (four pixels or more) is colour no pen explains — a word in a colour
+    // too rare to be a pen, a thin link whose pen never shows fully covered.
+    // Whitened, it left its line certified without it; scanLine counts the
+    // core between a line's glyphs as residual (page.lost).
+    let lost = null;
+    for (const core of lostCores) for (const i of core) if (!converted[i]) (lost ??= new Uint8Array(N))[i] = 1;
     // ---- the acceptance band (see the header) ----
     let bandLo = null, bandHi = null;
     if (convertedN) {
@@ -2679,7 +2830,7 @@
         else { bandLo[i] = gray[i]; bandHi[i] = gray[i]; }
       }
     }
-    return { gray, converted, convertedN, removed, bandLo, bandHi, whitened,
+    return { gray, converted, convertedN, removed, bandLo, bandHi, whitened, lost,
       pens: pens.map(p => [p.C[0], p.C[1], p.C[2], p.c]) };
   }
 

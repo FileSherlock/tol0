@@ -490,3 +490,28 @@ test('layoutLine: a law (quantization, scale, kern) and per-space widths', () =>
   const S = R.layoutLine(set, 'A B C A', 0, { spaceAdv: 3, spaceWidths: [4, 2.5] });
   assert.deepStrictEqual(S.glyphs.map(g => g.penRaw), [0, 10, 18.5, 27.5]);   // measured gaps first, spaceAdv after
 });
+
+test('lineLayout: a word the law cannot write is laid as the page has it — an unedited line returns every pen', () => {
+  // "ABBA AB": the producer laid the first word with one glyph a lattice step
+  // off its law (a Word page places a word by where it starts), the second
+  // by the law; no start of the first word writes all of its pens
+  const hm = hmSet();
+  const m = { quant: 1000, scale: 1, kern: new Map() };
+  const ents = [];
+  let x = 52.31, i = 0;
+  for (const [ch, extra] of [['A', 0], ['B', 0], ['B', 0.5], ['A', 0], [' '], ['A', 0], ['B', 0]]) {
+    if (ch === ' ') { x += 4.17; i++; continue; }
+    x += extra;
+    ents.push({ i: i++, ch, pen: R.snapX(x), adv: R.advanceOf(hm, ch) });
+    x += R.lawAdv(R.advanceOf(hm, ch), 16, m);
+  }
+  const ll = R.lineLayout({ entries: ents }, 16, m, 4);
+  assert.ok(!ll.feasible && ll.words === 2 && ll.written === 1, 'the first word is not the law\'s');
+  assert.strictEqual(ll.nudges.length, ents.length);
+  assert.deepStrictEqual(ll.nudges.slice(4), [0, 0]);                     // the law's word keeps the law
+  const lay = R.layoutLine(hm, 'ABBA AB', ents[0].pen + ll.delta, { metrics: m, spaceWidths: ll.spaceWidths, nudges: ll.nudges });
+  assert.deepStrictEqual(lay.glyphs.map(g => g.pen), ents.map(e => e.pen));
+  // without the nudges the first word comes back under the law, a step off
+  const plain = R.layoutLine(hm, 'ABBA AB', ents[0].pen + ll.delta, { metrics: m, spaceWidths: ll.spaceWidths });
+  assert.notDeepStrictEqual(plain.glyphs.map(g => g.pen), ents.map(e => e.pen));
+});

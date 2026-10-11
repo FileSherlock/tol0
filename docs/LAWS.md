@@ -203,6 +203,24 @@ through the law, and counts right / wrong / refused per amount of leak
 Refusal is the common verdict and the point: the reader reads a leaked glyph
 when the leak is enough and says nothing when it is not.
 
+**A glyph glued to a bar keeps its columns.** `detectObjects` clips a box's
+rows inward to the columns dark on 8 of its rows — more than an x-height glyph
+pressed against the bar can be — so a quote or a `<` bridged into a row's run
+stays outside the mask. A *tall* glyph passes that floor: a `(` against a
+Calibri 12 pt bar (recto-eval's synthetic seams page, 2026-10-11) has two
+columns dark on 9 of the bar's 19 rows, and went under the mask with the bar
+in five slices; its line certified as `The clerk ) kept`. A run of such
+columns narrower than any bar (< 5 px; a one-character redaction is 9) within
+two columns of a real bar's edge — a wide run holding five columns dark on
+every body row — and cut off from it by a column that is not the bar's is a
+glyph's. A wider stacked box's protrusion and a skewed scan's edge are
+contiguous with the body and stay; columns further out (a table's vertical
+line, another cell's letters) hold a crossing border's row extent as before;
+a shaded cell (light rules around dark letters, no full column) keeps the old
+rule — applied to it, fbimemo's 29 header cells changed. Objects change on 3
+of 700 pages of recto-eval's corpus, each a glyph against a bar; gate
+byte-identical.
+
 ### String hypotheses under a bar (`engine/hypothesis.js`)
 
 The same law run the other way round, over a *short list*: given names that
@@ -346,7 +364,11 @@ reads coloured text with the sets it has (`colourInk` in
 
 What is *not* a pen's ramp is still whitened, because the certificate means
 nothing over it. The pens are the page's own — dark, saturated colours that
-occur fully covered at least 20 times — and a coloured component (the same
+occur fully covered at least 12 times (20 until 2026-10-11: a short
+light-blue word showed its pen on 18 pixels and was whitened; over
+recto-eval's 90 colour pages the lower floor changes that page alone, and
+below ~10 a thin Courier link's partial coverage, repeated 9 times, becomes a
+wrong pen) — and a coloured component (the same
 seeds-and-flood set the whitening always took) is text when one pen explains
 three quarters of its **dark** pixels within ±1. Judged on the dark core on
 purpose: near white every ramp converges and any pen fits, so a halo of JPEG
@@ -400,6 +422,17 @@ Two consequences the reader lives with:
   did again in 2026-09: a pad shrunk to the rows that vote as the rule's AA
   read the dots and broke 12 corpus lines of 10,000, two of them clean — on
   some pages the row over an underline IS a composite zone).
+- **Whitened text is lost ink, not paper.** A component whitened for want
+  of a pen but shaped like text — a dark core of four pixels or more, which
+  a JPEG halo never has — was simply gone, and its line could certify
+  without it: a Courier e-mail's whole blue underlined URL, too thin to show
+  its pen fully covered, read `The schedule is posted at for everyone.`,
+  clean. `colourInk` returns those cores as `lost`; `scanLine` counts the
+  ones between a line's first and last glyph, on its band and not under a
+  detected object (a redaction bar's first column can carry a tint — email-2010
+  p1's (1,1,10) — and is the bar's), as residual. The
+  line reads as before and does not certify (2026-10-11; gate
+  byte-identical).
 - **What survives whitening inside an emblem is the emblem's.** A seal or a
   logo is colours no pen explains — whitened — with black parts inside (an
   eagle, a ring's lettering) that survive as components no set can read and
@@ -425,6 +458,31 @@ Two consequences the reader lives with:
   bar. `email` 14 □ → 7, four lines gaining their dots and nothing else, 17
   gate documents byte-identical; 300 random corpus documents: 272 lines
   better, none that read clean lost, 307 dots gained, no glyph lost.
+
+**An underline under one short word is a rule too.** The run rule wants
+40 px; `not` underlined in Times 12 pt is 20, so its stroke was ink no glyph
+explains (`will □not`). A strict dark run of 9–39 px is an underline when it
+sits on 1–3 flat rows (each one byte ±8 along the run), the rows just above
+and below are white but where a descender crosses (ink on both sides), and
+the underlined word's feet are in the two rows over the clean one — not when
+it is a piece of a long underline a descender broke (12 px from a rule on its
+rows: masking the `htt` of an underlined `http://` moved that line's
+baseline decomposition from 915/0 to 914/½, exact as read either way). Eight
+rows up instead of two took the top bar of `=` signs under a redaction bar.
+On recto-eval's corpus it finds fbimemo's form-field underlines (16 pages)
+and nothing else real; gate byte-identical.
+
+**A pad hides no glyph.** The pad stays don't-care for reading, but not for
+the certificate. A glyph mostly inside a lone rule's pad that no candidate
+reads left a pixel or two outside it — absorbed — and its line certified
+without it: recto-eval's synthetic `Tuesday, May 8`, underlined, lost its
+comma (best pen one byte off at one pixel, at every tolerance) and read
+clean. `scanLine`'s final scan now notes the pad cells each accepted glyph's
+ink lies on; dark pad ink (< 160) on none of them, on the line's own
+underline rows (from 3 rows over the baseline down) whose free pad cells are
+white (≥ 60 % ≥ 240 — not the rule's own anti-aliasing), is residual. The
+line reads as before and does not certify. Over recto-eval's 43 documents
+exactly that one line changes; gate byte-identical.
 
 An underline crosses every descender of the words it underlines, so once a
 blue link is ink its underline is pieces of 1–17 px that no glyph explains;

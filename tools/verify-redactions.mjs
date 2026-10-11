@@ -25,6 +25,7 @@ import { dirname, join, resolve } from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
+import { rectoLayout } from './recto-layout.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, '..');
@@ -57,7 +58,8 @@ for (let i = 2; i < process.argv.length; i++) {
   else { console.error(`unknown arg ${a}`); process.exit(2); }
 }
 o.dir ??= join(o.recto, '_temp_test_files');
-if (!existsSync(join(o.recto, 'manage.py'))) { console.error(`no manage.py at ${o.recto} — pass --recto`); process.exit(2); }
+const layout = rectoLayout(o.recto);
+if (!layout) { console.error(`no Recto checkout at ${o.recto} — pass --recto`); process.exit(2); }
 if (!o.chrome) { console.error('no Chrome/Chromium/Edge found — pass --chrome <exe> or set CHROME'); process.exit(2); }
 const pdfs = readdirSync(o.dir).filter(f => /\.pdf$/i.test(f) && (!o.only || f.toLowerCase().includes(o.only.toLowerCase()))).sort().slice(0, o.limit);
 if (!pdfs.length) { console.error(`no PDFs in ${o.dir}`); process.exit(2); }
@@ -75,7 +77,7 @@ async function waitForServer(base, timeoutMs = 30000) {
     try { const r = await fetch(base); if (r.ok) return; } catch {}
     await new Promise(r => setTimeout(r, 200));
   }
-  throw new Error('Django server did not become ready');
+  throw new Error('the Recto server did not become ready');
 }
 const describe = e => [e?.name, e?.message].filter(Boolean).join(' | ').replace(/[\r\n]+/g, ' ').slice(0, 300);
 
@@ -141,8 +143,8 @@ REFERENCE['efta01649149.pdf'] = memoTruth([[392, 'Sarah Kellen'], [480, 'Adriana
 async function run() {
   const port = await freePort();
   const base = `http://127.0.0.1:${port}`;
-  const server = spawn(process.platform === 'win32' ? 'python' : 'python3',
-    ['manage.py', 'runserver', `127.0.0.1:${port}`, '--noreload'], { cwd: o.recto, stdio: 'ignore' });
+  const { command, args } = layout.server(port);
+  const server = spawn(command, args, { cwd: o.recto, stdio: 'ignore' });
   let browser, failed = false;
   const totals = { docs: 0, bars: 0, listed: 0, unique: 0, tied: 0, none: 0, contradictedAll: 0, nulls: 0 };
   try {
@@ -153,7 +155,7 @@ async function run() {
     const errors = [];
     page.on('pageerror', e => errors.push(String(e)));
     const ready = () => page.waitForFunction(() => typeof BlindOCR !== 'undefined' && typeof OCRTool !== 'undefined' &&
-      typeof ocrTestHypothesis === 'function' && typeof state !== 'undefined' && state.pageImages?.length > 0);
+      typeof ocrTestHypothesis === 'function' && typeof state !== 'undefined' && (state.pageImages ? state.pageImages.length : state.numPages) > 0);
     await page.goto(base, { waitUntil: 'load' });
     await ready();
 

@@ -271,6 +271,74 @@ test('detectObjects: a quote glued to a bar keeps its pixels, the bar keeps its 
   assert.ok(mask[25 * W + 100]);
 });
 
+// A TALL glyph glued to a bar (2026-10-11). The pixels are recto-eval's
+// synthetic Calibri 12 pt seams page, `The clerk (████) kept`: the '(' ends
+// one column short of the bar's 119 AA edge, and its two left columns are
+// dark on 9 of the bar's 19 rows — over the 8-row floor that tells a bar
+// column from an x-height glyph. They went under the mask with the bar in
+// five slices, and the line certified as `The clerk ) kept`. FAILS on the
+// pre-fix engine.
+
+test('detectObjects: a parenthesis glued to a bar keeps its pixels', () => {
+  const W = 300, page = makePage(W, 190);
+  const put = (y0, y1, x0, x1, v) => { for (let y = y0; y < y1; y++)
+    for (let x = x0; x < x1; x++) page.gray[y * W + x] = v; };
+  put(149, 167, 164, 260, 0);                         // the bar body
+  put(149, 167, 163, 164, 119);                       // its AA edge column
+  put(148, 149, 164, 260, 118); page.gray[148 * W + 163] = 183;   // top AA row
+  put(167, 168, 164, 260, 170); page.gray[167 * W + 163] = 210;   // bottom AA row
+  // the '(' — columns 159..162, rows 151..165, as on the page
+  const paren = [
+    [255, 255, 248, 244], [255, 255,  80, 126], [255, 222,   4, 226], [255, 134,  55, 255],
+    [255,  56, 122, 255], [251,   7, 168, 255], [224,   0, 198, 255], [209,   0, 211, 255],
+    [215,   0, 206, 255], [234,   0, 188, 255], [255,  21, 150, 255], [255,  80,  94, 255],
+    [255, 161,  23, 254], [255, 245,  18, 186], [255, 255, 158, 155]];
+  paren.forEach((row, r) => row.forEach((v, c) => { page.gray[(151 + r) * W + 159 + c] = v; }));
+  const { objects, mask } = E.detectObjects(page);
+  assert.strictEqual(objects.length, 1, 'one object, not slices');
+  const o = objects[0];
+  assert.strictEqual(o.type, 'box');
+  assert.deepStrictEqual([o.y0, o.y1, o.x0, o.x1], [148, 168, 163, 260]);
+  paren.forEach((row, r) => row.forEach((v, c) => {
+    if (v < 255) assert.strictEqual(mask[(151 + r) * W + 159 + c], 0, `'(' pixel (${159 + c},${151 + r}) must stay readable`);
+  }));
+  assert.ok(mask[155 * W + 163]);         // the bar's edge is the bar's
+});
+
+// A SHORT underline (2026-10-11): recto-eval's synthetic Times 12 pt page,
+// `will not be accepted` with `not` underlined — a 20-px stroke on two flat
+// rows (153, 170), under the 40-px run rule, so its line read `will □not`.
+// FAILS on the pre-fix engine. An `=` sign's bars (the e-mail sources' `=3D`)
+// are two flat strokes with no word over them, and stay ink.
+
+test('detectObjects: an underline under one short word is a rule', () => {
+  const W = 60, page = makePage(W, 40);
+  const not = [
+    [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 210, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 213, 111, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 232, 202, 254, 186, 186, 255, 255, 255, 255, 243, 177, 173, 237, 255, 255, 219, 35, 90, 216, 246, 255, 255, 255],
+    [255, 255, 255, 255, 164, 11, 92, 103, 91, 7, 140, 255, 255, 197, 81, 197, 157, 22, 184, 255, 174, 45, 64, 156, 231, 255, 255, 255],
+    [255, 255, 255, 255, 255, 64, 62, 248, 255, 108, 54, 255, 248, 27, 207, 255, 255, 117, 21, 242, 255, 75, 107, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 73, 103, 255, 255, 137, 39, 255, 179, 0, 249, 255, 255, 211, 0, 173, 255, 75, 107, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 75, 103, 255, 255, 140, 39, 255, 148, 0, 238, 255, 255, 243, 0, 149, 255, 75, 107, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 75, 103, 255, 255, 140, 39, 255, 182, 0, 193, 255, 255, 240, 0, 194, 255, 75, 107, 255, 255, 255, 255, 255],
+    [255, 255, 255, 255, 255, 71, 101, 255, 255, 138, 36, 255, 251, 35, 91, 255, 255, 186, 49, 254, 255, 80, 88, 250, 221, 255, 255, 255],
+    [255, 255, 255, 255, 189, 20, 39, 195, 209, 60, 5, 168, 255, 208, 34, 106, 150, 82, 222, 255, 255, 161, 2, 72, 240, 255, 255, 255],
+    [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 212, 220, 255, 255, 255, 255, 255, 241, 253, 255, 255, 255, 255],
+    [255, 255, 255, 249, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 219, 255, 255, 255],
+    [255, 255, 255, 250, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 225, 255, 255, 255]];
+  not.forEach((row, r) => row.forEach((v, c) => { page.gray[(10 + r) * W + 16 + c] = v; }));
+  const { objects } = E.detectObjects(page);
+  assert.strictEqual(objects.length, 1);
+  const o = objects[0];
+  assert.strictEqual(o.type, 'rule');
+  assert.deepStrictEqual([o.y0, o.y1, o.x0, o.x1], [21, 23, 20, 40]);
+  // the same stroke with no word over it (an em dash's, an `=` bar's) is ink
+  const bare = makePage(W, 40);
+  not.slice(11).forEach((row, r) => row.forEach((v, c) => { bare.gray[(21 + r) * W + 16 + c] = v; }));
+  assert.strictEqual(E.detectObjects(bare).objects.length, 0);
+});
+
 test('detectObjects: a glyph tip fused to a bar edge does not cost the edge its padding', () => {
   // The right bar of the same line: a '<' whose tip is dark on two rows of
   // the bar's light AA edge column split the box at those rows, and the
@@ -514,6 +582,24 @@ test("colourInk: a multicolour blob is nobody's ramp and is whitened, neutral in
   assert.ok(c.convertedN > 0 && c.convertedN < 400, 'converted ' + c.convertedN);   // the word + the ramp strip
 });
 
+// A pen is a colour that shows fully covered 12 times (20 until 2026-10-11:
+// a short light-blue word, 18 such pixels, was whitened from its certified
+// line), and colour no pen explains but shaped like text — a dark core — is
+// LOST INK the reader must not certify over (page.lost).
+test('colourInk: a colour fully covered 16 times is a pen; a text-shaped blob no pen fits is lost ink', () => {
+  const W = 40, H = 20, rgb = new Uint8Array(W * H * 3).fill(255);
+  for (let y = 4; y < 8; y++) for (let x = 4; x < 8; x++) rgb.set([46, 116, 181], (y * W + x) * 3);   // 16 px of one pen
+  const c = E.colourInk(W, H, rgb, 3);
+  assert.ok(c.pens.some(p => p[0] === 46 && p[1] === 116 && p[2] === 181), JSON.stringify(c.pens));
+  assert.strictEqual(c.convertedN, 16);
+  assert.strictEqual(c.removed, 0);
+  assert.strictEqual(c.lost, null);
+  const { W: W2, H: H2, rgb: rgb2 } = colourPage();
+  const b = E.colourInk(W2, H2, rgb2, 3);
+  assert.strictEqual(b.lost[10 * W2 + 70], 1, "the blob's dark core is lost ink");
+  assert.strictEqual(b.lost[12 * W2 + 4] ?? 0, 0, 'the converted blue word is not');
+});
+
 // A page the producer QUANTIZED after compositing: the same blue word, with
 // every channel snapped to a multiple of 16. Several coverages then share one
 // colour, so a single recovered byte is a guess and the band is the answer.
@@ -749,6 +835,52 @@ test('scanLine: object-mask pixels are don\'t-care, not fails', () => {
   assert.deepStrictEqual(L.glyphs.map(g => g.ch), ['A', 'C']);
   assert.strictEqual(L.fails.length, 0);
   assert.strictEqual(L.residual, 0);
+});
+
+// A PAD HIDES NO GLYPH (2026-10-11): a lone rule's ±2 pad rows are
+// don't-care, so ink there that no glyph reads used to vanish from a clean
+// line — recto-eval's `Tuesday, May 8` underlined lost its comma and
+// certified. Dark pad ink that no accepted glyph's ink lies on is residual
+// now: the line reads as before and does not certify. FAILS pre-fix.
+
+test('scanLine: dark ink in an underline\'s pad that no glyph explains blocks the certificate', () => {
+  const set = abcSet();
+  const underlined = blob => {
+    const page = makePage(60, 30), mask = zeroMask(page);
+    drawWord(page, set, 'AC', [10, 22], 20);
+    for (let x = 8; x < 30; x++) {
+      page.gray[21 * 60 + x] = 100; mask[21 * 60 + x] = 1;              // the rule, baseline + 1
+      for (const y of [19, 20, 22, 23]) if (!mask[y * 60 + x]) mask[y * 60 + x] = 4;   // its pad
+    }
+    // a comma's head in the pad, on the glyphs' feet row (this font has no
+    // descent: the scan's window ends at the baseline)
+    if (blob) { page.gray[19 * 60 + 16] = 40; page.gray[19 * 60 + 17] = 0; }
+    const rules = [{ type: 'rule', x0: 8, y0: 21, x1: 30, y1: 22 }];
+    return E.scanLine(page, mask, set, 0, 20, 0, 60, Infinity, Infinity, 0, null, null, null, null, null, { rules });
+  };
+  const plain = underlined(false);
+  assert.deepStrictEqual(plain.glyphs.map(g => g.ch), ['A', 'C']);
+  assert.strictEqual(plain.residual, 0, 'the glyphs\' own feet in the pad are theirs');
+  const hidden = underlined(true);
+  assert.deepStrictEqual(hidden.glyphs.map(g => g.ch), ['A', 'C']);
+  assert.strictEqual(hidden.fails.length, 0);
+  assert.strictEqual(hidden.residual, 2);
+});
+
+test('scanLine: lost colour between a line\'s glyphs blocks the certificate, beside them not', () => {
+  const set = abcSet();
+  const read = lostAt => {
+    const page = makePage(60, 30);
+    drawWord(page, set, 'AC', [10, 22], 20);
+    page.lost = new Uint8Array(60 * 30);
+    for (const [x, y] of lostAt) page.lost[y * 60 + x] = 1;
+    return E.scanLine(page, zeroMask(page), set, 0, 20, 0, 60);
+  };
+  const between = read([[16, 16], [17, 16], [16, 17], [17, 17]]);   // a whitened word's core, mid-line
+  assert.deepStrictEqual(between.glyphs.map(g => g.ch), ['A', 'C']);
+  assert.strictEqual(between.residual, 4);
+  const beside = read([[40, 16], [41, 16], [40, 17], [41, 17]]);    // a logo past the line's end
+  assert.strictEqual(beside.residual, 0);
 });
 
 // ---- redaction boxes: the EDGE MODEL (2026-09-03) ----
